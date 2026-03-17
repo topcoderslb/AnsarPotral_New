@@ -41,3 +41,19 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Admin Dashboard (Next.js)
+admin-dashboard/node_modules/
+admin-dashboard/.next/
+admin-dashboard/.env
+admin-dashboard/.env.local
+admin-dashboard/.env.production
+
+# Backend (PHP)
+backend/uploads/*
+!backend/uploads/.htaccess
+
+# Environment files
+.env
+.env.local
+.env.*.local

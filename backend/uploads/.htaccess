@@ -1,0 +1,15 @@
+Allow from all
+
+# Allow cross-origin access to uploaded images
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Methods "GET, OPTIONS"
+Header set Access-Control-Allow-Headers "Content-Type"
+
+# Serve correct MIME types
+AddType image/jpeg .jpg .jpeg
+AddType image/png .png
+AddType image/gif .gif
+AddType image/webp .webp
+
+# Disable PHP execution in uploads directory for security
+php_flag engine off

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:in_app_update/in_app_update.dart';
+import 'package:flutter/foundation.dart';
 import 'home.dart';
-import 'sign_in.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -16,8 +17,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final storage = const FlutterSecureStorage();
-
   @override
   void initState() {
     super.initState();
@@ -25,6 +24,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _checkForUpdate() async {
+    // in_app_update only works on Android
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
     try {
       final AppUpdateInfo updateInfo = await InAppUpdate.checkForUpdate();
 
@@ -79,21 +80,16 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Ansar Portal',
+      title: 'Ansar Portal / المنصّة الرقميّة لبلدية أنصار',
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
-        backgroundColor: Colors.deepOrange,
+        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.deepOrange),
+        textTheme: GoogleFonts.tajawalTextTheme(
+          Theme.of(context).textTheme,
+        ),
+        fontFamily: GoogleFonts.tajawal().fontFamily,
       ),
-      home: FutureBuilder<String?>(
-        future: storage.read(key: 'isSignedIn'),
-        builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
-          if (snapshot.hasData && snapshot.data == 'true') {
-            return const HomePage(); // Navigate to home page if signed in
-          } else {
-            return const SignInPage(); // Navigate to sign-in page if not signed in
-          }
-        },
-      ),
+      home: const HomePage(), // Direct navigation to home page
       debugShowCheckedModeBanner: false,
     );
   }

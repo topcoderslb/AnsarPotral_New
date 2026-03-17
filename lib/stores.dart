@@ -1,43 +1,34 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:AnsarPortal/store_details.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'modern_app_bar.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'services/api_service.dart';
 
-class Store {
+class Shop {
   final int id;
   final String name;
   final String description;
-  final List<String> categories;
-  int totalLikes;
-  final List<String> images;
-  bool isLiked;
-  final bool archived; // Add archived property
+  final String category;
+  final String phoneNumber;
+  final String whatsappNumber;
+  final String imageUrl;
+  final String location;
 
-  Store({
+  Shop({
     required this.id,
     required this.name,
     required this.description,
-    required this.categories,
-    required this.totalLikes,
-    required this.images,
-    this.isLiked = false,
-    required this.archived, // Initialize archived property
+    required this.category,
+    required this.phoneNumber,
+    required this.whatsappNumber,
+    required this.imageUrl,
+    required this.location,
   });
-
-  factory Store.fromJson(Map<String, dynamic> json) {
-    return Store(
-      id: int.parse(json['store_id'].toString()),
-      name: json['store_name'] ?? '',
-      description: json['description'] ?? '',
-      categories: List<String>.from(json['categories'] ?? []),
-      totalLikes: int.tryParse(json['total_likes'].toString()) ?? 0,
-      images: List<String>.from(json['images'] ?? []),
-      isLiked: false, // Initialize isLiked property
-      archived: json['archived'] == true, // Parse archived property from JSON
-    );
-  }
 }
 
 class StoresPage extends StatefulWidget {
@@ -48,457 +39,636 @@ class StoresPage extends StatefulWidget {
 }
 
 class _StoresPageState extends State<StoresPage> {
-  List<Store> stores = [];
-  List<Store> filteredStores = [];
+  List<Shop> shops = [];
+  List<Shop> filteredShops = [];
   List<String> categories = [];
   String? selectedCategory;
-  String? userId;
-  final storage = const FlutterSecureStorage();
+  final TextEditingController _searchController = TextEditingController();
+  bool _isLoading = true;
+  final ApiService _apiService = ApiService();
 
-
-  Future<void> fetchStores() async {
-    try {
-      final response = await http.get(Uri.parse('https://ansarportal-deaa9ded50c7.herokuapp.com/api/view_stores.php'));
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonResponse = json.decode(response.body);
-        setState(() {
-          // Filter out archived stores
-          stores = jsonResponse.map((store) {
-            final parsedStore = Store.fromJson(store);
-            print('Store ${parsedStore.id}: archived=${parsedStore.archived}');
-            return parsedStore;
-          })
-              .where((store) => !store.archived) // Exclude archived stores
-              .toList();
-          filteredStores = List.from(stores);
-        });
-        await getUserId();
-        await fetchUserLikes();
-      } else {
-        throw Exception('Failed to load stores');
-      }
-    } catch (error) {
-      print('Error fetching stores: $error');
-    }
-  }
-
-
-
-  Future<void> fetchCategories() async {
-    try {
-      final response = await http.get(Uri.parse('https://ansarportal-deaa9ded50c7.herokuapp.com/api/view_categories.php'));
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonResponse = json.decode(response.body);
-        setState(() {
-          categories = jsonResponse.map((category) => category['category_name'].toString()).toList();
-        });
-      } else {
-        throw Exception('Failed to load categories');
-      }
-    } catch (error) {
-      print('Error fetching categories: $error');
-    }
-  }
-
-
-  // Method to retrieve user ID from Flutter Secure Storage
-  Future<void> getUserId() async {
-    userId = await storage.read(key: 'userId');
-    print('User ID: $userId'); // Print user ID
-  }
-
-  Future<void> fetchUserLikes() async {
-    try {
-      // Make POST request to fetch user likes with user ID from session
-      final response = await http.post(
-        Uri.parse('https://ansarportal-deaa9ded50c7.herokuapp.com/api/fetch_user_likes.php'),
-        body: {'user_id': userId!},
-      );
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonResponse = json.decode(response.body);
-        print('Fetch User Likes Response: $jsonResponse'); // Print response
-        setState(() {
-          // Convert the list of liked store IDs to a set for efficient lookup
-          final likedStoreIdsSet = Set<int>.from(jsonResponse['liked_stores']);
-
-          // Update isLiked property for each store based on user likes
-          for (var store in stores) {
-            final isLiked = likedStoreIdsSet.contains(store.id);
-            print('Store ${store.id} isLiked: $isLiked');
-            store.isLiked = isLiked;
-          }
-        });
-      } else {
-        throw Exception('Failed to load user likes');
-      }
-    } catch (error) {
-      print('Error fetching user likes: $error');
-      // Handle error accordingly
-    }
-  }
-
-  // Method to toggle like/unlike a store
-  Future<void> toggleLike(Store store) async {
-    try {
-      // Make POST request to like/unlike a store with user ID from session
-      final response = await http.post(
-        Uri.parse('https://ansarportal-deaa9ded50c7.herokuapp.com/api/like_store.php'),
-        body: {
-          'user_id': userId!,
-          'store_id': store.id.toString(),
-          'action': store.isLiked ? 'unlike' : 'like',
-        },
-      );
-      if (response.statusCode == 200) {
-        // Toggle isLiked property based on the response
-        setState(() {
-          store.isLiked = !store.isLiked;
-          print('Store ${store.id} isLiked toggled: ${store.isLiked}');
-          // Update totalLikes based on the response
-          if (store.isLiked) {
-            store.totalLikes++;
-          } else {
-            store.totalLikes--;
-          }
-        });
-
-        // Save the updated liked status locally
-        await saveLikedStatus(store.id.toString(), store.isLiked);
-      } else {
-        throw Exception('Failed to toggle like');
-      }
-    } catch (error) {
-      print('Error toggling like: $error');
-      // Handle error accordingly
-    }
-  }
-
-  // Method to save the liked status locally
-  Future<void> saveLikedStatus(String storeId, bool isLiked) async {
-    await storage.write(key: 'liked_$storeId', value: isLiked.toString());
-  }
-
-  // Method to retrieve the liked status locally
-  Future<bool?> getLikedStatus(String storeId) async {
-    final likedStatus = await storage.read(key: 'liked_$storeId');
-    return likedStatus != null ? likedStatus == 'true' : null;
-  }
-
-  void handleSearch(String query) async {
-    setState(() async {
-      if (query.isNotEmpty) {
-        // Make GET request to search stores
-        http.Response response = await http.get(
-          Uri.parse(
-              'https://ansarportal-deaa9ded50c7.herokuapp.com/api/search_stores.php?query=$query'),
-        );
-        if (response.statusCode == 200) {
-          final List<dynamic> jsonResponse = json.decode(response.body);
-          setState(() {
-            // Update filteredStores with search results
-            filteredStores =
-                jsonResponse.map((store) => Store.fromJson(store)).toList();
-          });
-          // Fetch user ID
-          await getUserId();
-          // Fetch user likes after loading stores
-          await fetchUserLikes();
-        } else {
-          throw Exception('Failed to load stores');
-        }
-      } else {
-        // If query is empty, show all stores
-        setState(() {
-          filteredStores = List.from(stores);
-        });
-      }
-    });
-  }
-
-
-  // Define a TextEditingController
-  late TextEditingController _searchController;
-
-  // Override initState() method to fetch stores, user ID, and liked status when widget is initialized
   @override
   void initState() {
     super.initState();
-    _searchController = TextEditingController();
-    fetchStores(); // Fetch stores and user ID
-    fetchCategories();
+    _loadShopsFromApi();
   }
 
-  @override
-  void dispose() {
-    // Dispose the TextEditingController
-    _searchController.dispose();
-    super.dispose();
+  Future<void> _loadShopsFromApi() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final storesData = await _apiService.getStores();
+      
+      shops = storesData.map((data) => Shop(
+        id: int.tryParse(data['id']?.toString() ?? '0') ?? 0,
+        name: data['name'] ?? '',
+        description: data['description'] ?? '',
+        category: data['category'] ?? '',
+        phoneNumber: data['phone_number'] ?? data['phoneNumber'] ?? '',
+        whatsappNumber: data['whatsapp_number'] ?? data['whatsappNumber'] ?? '',
+        imageUrl: data['image_url'] ?? data['imageUrl'] ?? '',
+        location: data['location'] ?? '',
+      )).toList();
+
+      // Extract unique categories from loaded shops
+      categories = shops.map((shop) => shop.category).toSet().toList();
+      categories.insert(0, 'جميع المتاجر');
+
+      setState(() {
+        filteredShops = List.from(shops);
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Error loading shops: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
+  void _filterShops() {
+    setState(() {
+      filteredShops = shops.where((shop) {
+        bool matchesSearch = shop.name.toLowerCase().contains(_searchController.text.toLowerCase()) ||
+                           shop.description.toLowerCase().contains(_searchController.text.toLowerCase());
+        bool matchesCategory = selectedCategory == null || 
+                              selectedCategory == 'جميع المتاجر' || 
+                              shop.category == selectedCategory;
+        return matchesSearch && matchesCategory;
+      }).toList();
+    });
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('STORES', style: TextStyle(color: Colors.white,
-            fontFamily: 'kuro',
-            fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.deepOrange[700], // Dark orange background color
-        centerTitle: true,
-        iconTheme: IconThemeData(color: Colors.white),
-      ),
+  void _makePhoneCall(String phoneNumber) async {
+    final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
+    if (await canLaunchUrl(phoneUri)) {
+      await launchUrl(phoneUri);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('لا يمكن الاتصال بالرقم')),
+      );
+    }
+  }
 
-      body:Column(
-        children: [
-          SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _searchController,
-              cursorColor: Colors.deepOrange[700],
-              style: TextStyle(fontFamily: 'kuro'),
-              onChanged: (value) {
-                setState(() {
-                  handleSearch(value);
-                });
-              },
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.symmetric(vertical: 15.0),
-                hintStyle: TextStyle(fontFamily: 'kuro'),
-                hintText: 'Search...',
-                prefixIcon: Icon(Icons.search),
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.clear),
-                  onPressed: () {
-                    _searchController.clear(); // Clear the search text
-                    setState(() {
-                      handleSearch(
-                          ''); // Reset the filtered stores to show all stores
-                    });
-                  },
-                ),
-                border: OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.deepOrange[700]!), // Set border color to deepOrange[700]
-                ),
-              ),
-            ),
+  void _openWhatsApp(String phoneNumber) async {
+    final Uri whatsappUri = Uri.parse('https://wa.me/$phoneNumber');
+    if (await canLaunchUrl(whatsappUri)) {
+      await launchUrl(whatsappUri);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('لا يمكن فتح واتساب')),
+      );
+    }
+  }
+
+  void _showShopPopup(BuildContext context, Shop shop) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.symmetric(
+            horizontal: screenWidth * 0.05,
+            vertical: screenHeight * 0.05,
           ),
-
-          SizedBox(height: 5),
-
-          Padding(
-            padding: const EdgeInsets.all(8.0),
+          child: Container(
+            constraints: BoxConstraints(
+              maxHeight: screenHeight * 0.85,
+              maxWidth: screenWidth * 0.95,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 20,
+                  offset: Offset(0, 10),
+                ),
+              ],
+            ),
             child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-
-                        selectedCategory = null;
-                        filteredStores = List.from(stores);
-                      });
-                    },
-
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                      margin: EdgeInsets.only(right: 5),
-                      decoration: BoxDecoration(
-                        color: selectedCategory == null ? Colors.deepOrange : null,
-                        borderRadius: BorderRadius.circular(20),
-                        border: selectedCategory == null
-                            ? null
-                            : Border.all(color: Colors.grey),
-
-                      ),
-                      child: Text(
-                        'All Stores/ متاجر',
-                        style: TextStyle(fontFamily: 'kuro', color: selectedCategory == null ? Colors.white : null),
+                  // Shop Image
+                  if (shop.imageUrl.isNotEmpty)
+                  Container(
+                    height: screenHeight * 0.25,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                      child: CachedNetworkImage(
+                        imageUrl: shop.imageUrl,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        placeholder: (context, url) => Container(
+                          color: Colors.grey.shade300,
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.deepOrange),
+                            ),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          color: Colors.grey.shade300,
+                          child: Icon(
+                            Icons.error,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
                       ),
                     ),
                   ),
+                  
+                  // Shop Info
+                  Padding(
+                    padding: EdgeInsets.all(16), // Reduced padding
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Shop Name and Category
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                shop.name,
+                                style: TextStyle(
+                                  fontSize: 20, // Reduced font size
+                                  fontWeight: FontWeight.bold,
+                                  
+                                  color: Colors.deepOrange.shade700,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.deepOrange.shade50,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: Colors.deepOrange.shade200),
+                              ),
+                              child: Text(
+                                shop.category,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.deepOrange.shade700,
+                                  
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
 
-                  SizedBox(width: 5),
-                  ...categories.map((category) {
-                    final isSelected = category == selectedCategory;
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedCategory = isSelected ? null : category;
-                          filteredStores = selectedCategory != null
-                              ? stores.where((store) => store.categories.contains(selectedCategory)).toList()
-                              : List.from(stores);
-                        });
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                        margin: EdgeInsets.only(right: 10),
-                        decoration: BoxDecoration(
-                          color: isSelected ? Colors.deepOrange : null,
-                          borderRadius: BorderRadius.circular(20),
-                          border: isSelected
-                              ? null
-                              : Border.all(color: Colors.grey),
+                        SizedBox(height: 8), // Reduced spacing
+
+                        // Description
+                        Text(
+                          shop.description,
+                          style: TextStyle(
+                            fontSize: 14, // Reduced font size
+                            color: Colors.grey.shade600,
+                            
+                            height: 1.3,
+                          ),
+                          textAlign: TextAlign.justify,
                         ),
-                        child: Text(
-                          category,
-                          style: TextStyle(fontFamily: 'kuro', color: isSelected ? Colors.white : null),
+
+                        SizedBox(height: 16), // Reduced spacing
+
+                        // Contact Buttons
+                        Row(
+                          children: [
+                            // Call Button
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  _makePhoneCall(shop.phoneNumber);
+                                },
+                                icon: Icon(Icons.phone, color: Colors.white, size: 18),
+                                label: Text(
+                                  'اتصال',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  padding: EdgeInsets.symmetric(vertical: 12),
+                                ),
+                              ),
+                            ),
+
+                            SizedBox(width: 10),
+
+                            // WhatsApp Button
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  _openWhatsApp(shop.whatsappNumber);
+                                },
+                                icon: Icon(Icons.message, color: Colors.white, size: 18),
+                                label: Text(
+                                  'واتساب',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Color(0xFF25D366),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  padding: EdgeInsets.symmetric(vertical: 12),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    );
-                  }).toList(),
+
+                        SizedBox(height: 12), // Reduced spacing
+
+                        // Close Button
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.grey.shade200,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                            ),
+                            child: Text(
+                              'إغلاق',
+                              style: TextStyle(
+                                color: Colors.grey.shade700,
+                                
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
+        );
+      },
+    );
+  }
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: ModernAppBar(title: 'قسم المتاجر'),
+      body: Column(
+        children: [
           SizedBox(height: 10),
-
-          filteredStores.isEmpty
-              ? Padding(
-            padding: EdgeInsets.only(top: 100.0),
-            child: Column(
-              children: [
-                Text(
-                  "No available stores",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'kuro',
-                  ),
+          
+          // Search Bar
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (value) => _filterShops(),
+              decoration: InputDecoration(
+                hintText: 'البحث في المتاجر...',
+                hintStyle: TextStyle(),
+                prefixIcon: Icon(Icons.search, color: Colors.deepOrange),
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.clear),
+                  onPressed: () {
+                    _searchController.clear();
+                    _filterShops();
+                  },
                 ),
-                const SizedBox(height: 10,),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.deepOrange, width: 2),
+                ),
+                filled: true,
+                fillColor: Colors.grey.shade50,
+              ),
+            ),
+          ),
+
+                     // Category Filter - Horizontally scrollable
+           Container(
+             height: 60,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+               padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                 children: categories.map((category) {
+                   final isSelected = selectedCategory == category;
+                   
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedCategory = isSelected ? null : category;
+                         _filterShops();
+                        });
+                      },
+                      child: Container(
+                       margin: EdgeInsets.only(right: 12),
+                       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        decoration: BoxDecoration(
+                         color: isSelected ? Colors.deepOrange : Colors.white,
+                         borderRadius: BorderRadius.circular(30),
+                         border: Border.all(
+                           color: isSelected ? Colors.deepOrange : Colors.grey.shade300,
+                           width: 1.5,
+                         ),
+                         boxShadow: [
+                           BoxShadow(
+                             color: Colors.black.withOpacity(0.1),
+                             blurRadius: 6,
+                             offset: Offset(0, 3),
+                           ),
+                         ],
+                       ),
+                       child: Center(
+                        child: Text(
+                          category,
+                           style: TextStyle(
+                             color: isSelected ? Colors.white : Colors.deepOrange,
+                             
+                             fontWeight: FontWeight.bold,
+                             fontSize: 14,
+                           ),
+                         ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+              ),
+            ),
+          ),
+
+          SizedBox(height: 16),
+
+          // Shops List
+          Expanded(
+            child: filteredShops.isEmpty
+                ? Center(
+            child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                        Icon(
+                          Icons.store_outlined,
+                          size: 64,
+                          color: Colors.grey.shade400,
+                        ),
+                        SizedBox(height: 16),
                 Text(
-                  "لا يوجد متاجر",
+                          'لا توجد متاجر',
                   style: TextStyle(
                     fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'kuro',
+                            color: Colors.grey.shade600,
+                    
                   ),
                 ),
               ],
             ),
           )
-              :   Expanded(
-            child: ListView.builder(
-              itemCount: filteredStores.length,
+                : ListView.builder(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: filteredShops.length,
               itemBuilder: (context, index) {
-                final store = filteredStores[index];
-                final String firstImage = store.images.isNotEmpty ? store.images
-                    .first : '';
-
-
-                return GestureDetector(
-                  onTap: () {
-                    if (filteredStores.isNotEmpty && index < filteredStores.length) {
-                      final store = filteredStores[index];
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => StoreDetailsPage(storeId: store.id),
+                      final shop = filteredShops[index];
+                      return _buildShopCard(shop);
+                    },
+                  ),
+          ),
+        ],
                         ),
                       );
                     }
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 8.0, horizontal: 16.0),
-                    // Adjust padding as needed
-                    child: Card(
-                      elevation: 4,
-                      // Add elevation for a raised effect
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      // Add rounded corners
+
+  Widget _buildShopCard(Shop shop) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: Offset(0, 5),
+          ),
+        ],
+      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          AspectRatio(
-                            aspectRatio: 4 / 3,
-                            // Set aspect ratio for the image
+                     // Shop Image - Tappable for popup
+           GestureDetector(
+             onTap: () => _showShopPopup(context, shop),
+             child: Container(
+               height: MediaQuery.of(context).size.height * 0.22,
+               decoration: BoxDecoration(
+                 borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+               ),
                             child: ClipRRect(
-                              borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(10)),
-                              child: CachedNetworkImage(
-                                imageUrl: firstImage,
+                 borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                 child: Stack(
+                   children: [
+                     shop.imageUrl.isNotEmpty
+                     ? CachedNetworkImage(
+                       imageUrl: shop.imageUrl,
                                 fit: BoxFit.cover,
-                                placeholder: (context, url) => Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                                errorWidget: (context, url, error) => Icon(Icons.error),
+                       width: double.infinity,
+                       height: double.infinity,
+                       placeholder: (context, url) => Container(
+                         color: Colors.grey.shade300,
+                         child: Center(
+                           child: CircularProgressIndicator(
+                             valueColor: AlwaysStoppedAnimation<Color>(Colors.deepOrange),
+                           ),
+                         ),
+                       ),
+                       errorWidget: (context, url, error) => Container(
+                         color: Colors.grey.shade300,
+                         child: Icon(
+                           Icons.image_not_supported,
+                           color: Colors.grey.shade600,
+                           size: 40,
+                         ),
+                       ),
+                     )
+                     : Container(
+                       color: Colors.grey.shade200,
+                       child: Center(
+                         child: Icon(Icons.store, color: Colors.grey.shade400, size: 48),
+                       ),
+                     ),
+                     // Zoom indicator
+                     Positioned(
+                       top: 8,
+                       right: 8,
+                       child: Container(
+                         padding: EdgeInsets.all(6),
+                         decoration: BoxDecoration(
+                           color: Colors.black.withOpacity(0.6),
+                           borderRadius: BorderRadius.circular(20),
+                         ),
+                         child: Icon(
+                           Icons.zoom_in,
+                           color: Colors.white,
+                           size: 16,
+                         ),
+                       ),
+                     ),
+                   ],
+                 ),
                               ),
                             ),
                           ),
+
+          // Shop Info
                           Padding(
                             padding: EdgeInsets.all(16),
-                            // Add padding inside the card
-                            child: Row(
+            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Shop Name and Category
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment
-                                        .start,
-                                    children: [
-                                      SizedBox(height: 8),
-                                      Text(
-                                        store.name,
-                                        style: TextStyle(fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            fontFamily: 'kuro'), // Adjust font size and weight
-                                      ),
-                                      SizedBox(height: 8),
-                                      // Add spacing between title and description
-                                      Text(
-                                        store.description,
-                                        style: TextStyle(fontSize: 14,
-                                            fontFamily: 'kuro'), // Adjust font size
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    IconButton(
-                                      iconSize: 30,
-                                      // Increase the size of the IconButton
-                                      icon: store.isLiked
-                                          ? Icon(
-                                          Icons.favorite, color: Colors.red)
-                                          : Icon(Icons.favorite_border),
-                                      onPressed: () => toggleLike(store),
-                                    ),
-                                    Text(
-                                      '${store.totalLikes} Likes',
-                                      style: TextStyle(fontSize: 14,
-                                          fontFamily: 'kuro'), // Adjust font size
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                      child: Text(
+                        shop.name,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          
+                          color: Colors.deepOrange.shade700,
+                        ),
                       ),
                     ),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.deepOrange.shade50,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.deepOrange.shade200),
+                      ),
+                      child: Text(
+                        shop.category,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.deepOrange.shade700,
+                          
+                                            fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: 8),
+
+                // Description
+                Text(
+                  shop.description,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade600,
+                    
                   ),
-                );
-              },
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+
+                SizedBox(height: 16),
+
+                // Contact Buttons
+                Row(
+                                  children: [
+                    // Call Button
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () => _makePhoneCall(shop.phoneNumber),
+                        icon: Icon(Icons.phone, color: Colors.white, size: 18),
+                        label: Text(
+                          'اتصال',
+                          style: TextStyle(
+                            color: Colors.white,
+                            
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(width: 12),
+
+                    // WhatsApp Button
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () => _openWhatsApp(shop.whatsappNumber),
+                        icon: Icon(Icons.message, color: Colors.white, size: 18),
+                        label: Text(
+                          'واتساب',
+                          style: TextStyle(
+                            color: Colors.white,
+                            
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF25D366),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],
       ),
-      backgroundColor: Colors.white, // White background color
     );
   }
-}
-// Define main() function to run the app
-void main() {
-  runApp(const MaterialApp(
-    home: StoresPage(),
-  ));
 }

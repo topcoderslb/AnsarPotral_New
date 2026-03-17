@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'modern_app_bar.dart';
+import 'services/api_service.dart';
 
 class StoreDetailsPage extends StatefulWidget {
   final int storeId;
@@ -16,7 +19,7 @@ class StoreDetailsPage extends StatefulWidget {
 
 class _StoreDetailsPageState extends State<StoreDetailsPage> {
   Map<String, dynamic>? storeDetails;
-  int _currentIndex = 0; // Add this line
+  int _currentIndex = 0;
 
   @override
   void initState() {
@@ -28,7 +31,7 @@ class _StoreDetailsPageState extends State<StoreDetailsPage> {
     try {
       final response = await http.get(
         Uri.parse(
-            'https://ansarportal-deaa9ded50c7.herokuapp.com/api/store_details.php?store_id=${widget.storeId}'),
+            '${ApiService.baseUrl}/stores.php?id=${widget.storeId}'),
       );
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
@@ -44,35 +47,63 @@ class _StoreDetailsPageState extends State<StoreDetailsPage> {
   }
 
   Widget _buildImageSlider() {
+    final screenHeight = MediaQuery.of(context).size.height;
+    // Support both 'images' array (old API) and single 'image_url' (new API)
+    List<String> images = [];
+    final imagesField = storeDetails!['images'];
+    if (imagesField is List && imagesField.isNotEmpty) {
+      images = imagesField.map((img) {
+        if (img is Map) return (img['image_url'] ?? img['imageUrl'] ?? '').toString();
+        return img.toString();
+      }).where((url) => url.isNotEmpty).toList();
+    }
+    if (images.isEmpty) {
+      final singleUrl = storeDetails!['image_url'] ?? storeDetails!['imageUrl'] ?? '';
+      if (singleUrl.isNotEmpty) images = [singleUrl];
+    }
+    if (images.isEmpty) {
+      return Container(
+        height: screenHeight * 0.3,
+        color: Colors.grey.shade200,
+        child: Center(
+          child: Icon(Icons.store, color: Colors.grey.shade400, size: 48),
+        ),
+      );
+    }
     return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Container(
-            height: 30, // Height of the black line
-            color: Colors.black,
-          ), // Black color
-
           Stack(
             children: [
               Container(
-                height: 350, // Adjust the height as needed
+                height: screenHeight * 0.35,
                 child: PageView.builder(
-                  itemCount: storeDetails!['images'].length,
+                  itemCount: images.length,
                   onPageChanged: (index) {
                     setState(() {
                       _currentIndex = index;
                     });
                   },
                   itemBuilder: (context, index) {
+                    final imgUrl = images[index];
+                    if (imgUrl.isEmpty) {
+                      return Container(
+                        color: Colors.grey.shade200,
+                        child: Icon(Icons.image_not_supported, color: Colors.grey),
+                      );
+                    }
                     return CachedNetworkImage(
-                      imageUrl: storeDetails!['images'][index],
+                      imageUrl: imgUrl,
                       fit: BoxFit.cover,
                       placeholder: (context, url) => Center(
                         child: CircularProgressIndicator(
                           valueColor: AlwaysStoppedAnimation<Color>(Colors.deepOrange),
                         ),
                       ),
-                      errorWidget: (context, url, error) => Icon(Icons.error),
+                      errorWidget: (context, url, error) => Container(
+                        color: Colors.grey.shade200,
+                        child: Icon(Icons.image_not_supported, color: Colors.grey, size: 40),
+                      ),
                     );
                   },
                 ),
@@ -81,8 +112,7 @@ class _StoreDetailsPageState extends State<StoreDetailsPage> {
         Positioned(
           top: 16,
           left: 16,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 20.0),
+          child: SafeArea(
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.deepOrange[700],
@@ -107,10 +137,10 @@ class _StoreDetailsPageState extends State<StoreDetailsPage> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              '${_currentIndex + 1}/${storeDetails!['images'].length}',
+              '${_currentIndex + 1}/${images.length}',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 16,
+                fontSize: 14,
               ),
             ),
           ),
@@ -123,20 +153,23 @@ class _StoreDetailsPageState extends State<StoreDetailsPage> {
   Widget _buildDetailRow(IconData icon, String value, String? url, String? phone) {
     return Row(
       children: [
-        Icon(icon, size: 40),
-        SizedBox(width: 8),
-        InkWell(
-          onTap: () {
-            // Add code to open the corresponding social media link
-            if (url != null && url.isNotEmpty) {
-              _launchURL(url);
-            } else if (phone != null) {
-              _launchPhone(phone); // Call phone number if available
-            }
-          },
-          child: Text(
-            '$value',
-            style: TextStyle(fontSize: 18, fontFamily: 'kuro'),
+        Icon(icon, size: 28, color: Colors.deepOrange),
+        SizedBox(width: 12),
+        Expanded(
+          child: InkWell(
+            onTap: () {
+              if (url != null && url.isNotEmpty) {
+                _launchURL(url);
+              } else if (phone != null && phone.isNotEmpty) {
+                _launchPhone(phone);
+              }
+            },
+            child: Text(
+              value,
+              style: TextStyle(fontSize: 15),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
+            ),
           ),
         ),
       ],
@@ -146,6 +179,7 @@ class _StoreDetailsPageState extends State<StoreDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: ModernAppBar(title: storeDetails?['store_name'] ?? 'Store Details'),
       body: storeDetails != null
           ? SingleChildScrollView(
         child: Column(
@@ -163,10 +197,10 @@ class _StoreDetailsPageState extends State<StoreDetailsPage> {
                     padding:
                     EdgeInsets.symmetric(vertical: 12, horizontal: 15),
                     child: Text(
-                      storeDetails!['store_name'],
+                      storeDetails!['store_name'] ?? storeDetails!['name'] ?? '',
                       style: TextStyle(
-                        fontSize: 24,
-                        fontFamily: 'kuro',
+                        fontSize: 20,
+                        
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
@@ -180,9 +214,9 @@ class _StoreDetailsPageState extends State<StoreDetailsPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          storeDetails!['description'],
+                          storeDetails!['description'] ?? '',
                           style:
-                          TextStyle(fontSize: 18, fontFamily: 'kuro'),
+                          TextStyle(fontSize: 15),
                         ),
                         SizedBox(height: 15),
                         Container(
@@ -196,16 +230,16 @@ class _StoreDetailsPageState extends State<StoreDetailsPage> {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     child: _buildDetailRow(Icons.store,
-                        storeDetails!['category_name'], null, null),
+                        storeDetails!['category_name'] ?? storeDetails!['category'] ?? '', null, null),
                   ),
                   SizedBox(height: 15),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     child: _buildDetailRow(
                       Icons.phone_android,
-                      storeDetails!['phone_number'],
+                      storeDetails!['phone_number'] ?? '',
                       null,
-                      storeDetails!['phone_number'],
+                      storeDetails!['phone_number'] ?? '',
                     ),
                   ),
                   SizedBox(height: 15),
@@ -216,63 +250,23 @@ class _StoreDetailsPageState extends State<StoreDetailsPage> {
                         // Add code to open map with store location
                       },
                       child: _buildDetailRow(Icons.location_on,
-                          storeDetails!['location'], null, null),
+                          storeDetails!['location'] ?? '', null, null),
                     ),
                   ),
-                  SizedBox(height: 30),
-                  Row(
+                  SizedBox(height: 20),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      IconButton(
-                        icon: Image.asset(
-                          'assets/facebook.png',
-                          width: 40,
-                          height: 40,
-                        ),
-                        color: Color(0xFF3b5998),
-                        iconSize: 40, // Facebook blue color
-                        onPressed: () {
-                          _launchURL(storeDetails!['facebook_url']);
-                        },
-                      ),
-                      IconButton(
-                        icon: Image.asset(
-                          'assets/instagram.png',
-                          width: 48,
-                          height: 48,
-                        ),
-                        color: Color(0xFFc32aa3),
-                        iconSize: 40,
-                        onPressed: () {
-                          _launchURL(storeDetails!['instagram_url']);
-                        },
-                      ),
-                      IconButton(
-                        icon: Image.asset(
-                          'assets/whatsapp.png',
-                          width: 42,
-                          height: 42,
-                        ),
-                        color: Color(0xFF25d366),
-                        iconSize: 40,
-                        onPressed: () {
-                          _launchURL(storeDetails!['whatsapp_number']);
-                        },
-                      ),
-                      IconButton(
-                        icon: Image.asset(
-                          'assets/tiktok.png',
-                          width: 42,
-                          height: 42,
-                        ),
-                        color: Color(0xFF000000),
-                        iconSize: 40,
-                        onPressed: () {
-                          _launchURL(storeDetails!['tiktok_url']);
-                        },
-                      ),
+                      _buildSocialIcon('assets/facebook.png', storeDetails!['facebook_url']),
+                      _buildSocialIcon('assets/instagram.png', storeDetails!['instagram_url']),
+                      _buildSocialIcon('assets/whatsapp.png', storeDetails!['whatsapp_number']),
+                      _buildSocialIcon('assets/tiktok.png', storeDetails!['tiktok_url']),
                     ],
                   ),
+                  ),
+                  SizedBox(height: 20),
                 ],
               ),
             ),
@@ -284,6 +278,24 @@ class _StoreDetailsPageState extends State<StoreDetailsPage> {
           valueColor: AlwaysStoppedAnimation<Color>(Colors.deepOrange),
         ),
       ),
+    );
+  }
+
+  Widget _buildSocialIcon(String assetPath, String? url) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final iconSize = (screenWidth * 0.09).clamp(28.0, 44.0);
+    return IconButton(
+      icon: Image.asset(
+        assetPath,
+        width: iconSize,
+        height: iconSize,
+        errorBuilder: (context, error, stackTrace) =>
+            Icon(Icons.link, size: iconSize, color: Colors.grey),
+      ),
+      iconSize: iconSize,
+      onPressed: (url != null && url.isNotEmpty)
+          ? () => _launchURL(url)
+          : null,
     );
   }
 
