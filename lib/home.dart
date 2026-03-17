@@ -325,23 +325,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _buildModernNavigationCard(
+                icon: Icons.store_rounded,
+                label: 'STORES',
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const StoresPage()),
+                ),
+                delay: 0,
+                screenSize: screenSize,
+              ),
+              _buildModernNavigationCard(
                 icon: Icons.description_rounded,
                 label: 'بيانات البلدية',
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => const MunicipalityStatementsPage()),
-                ),
-                delay: 0,
-                screenSize: screenSize,
-              ),
-              _buildModernNavigationCard(
-                icon: Icons.feedback_rounded,
-                label: 'تقديم الشكاوى',
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const ComplaintsPage()),
                 ),
                 delay: 100,
                 screenSize: screenSize,
@@ -356,11 +355,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _buildModernNavigationCard(
-                icon: Icons.store_rounded,
-                label: 'STORES',
+                icon: Icons.feedback_rounded,
+                label: 'تقديم الشكاوى',
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const StoresPage()),
+                  MaterialPageRoute(
+                      builder: (context) => const ComplaintsPage()),
                 ),
                 delay: 200,
                 screenSize: screenSize,

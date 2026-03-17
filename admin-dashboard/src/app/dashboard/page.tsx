@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { apiFetch } from '@/lib/api';
 import { Complaint, normalizeComplaint } from '@/lib/types';
 
@@ -129,22 +130,22 @@ export default function DashboardPage() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <h2 className="text-xl font-bold text-gray-800 mb-4">إجراءات سريعة</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <a href="/dashboard/stores" className="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-orange-50 transition-colors group">
+                    <Link href="/dashboard/stores" className="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-orange-50 transition-colors group">
                         <span className="text-3xl mb-2">➕</span>
                         <span className="text-sm text-gray-600 group-hover:text-orange-600">إضافة متجر</span>
-                    </a>
-                    <a href="/dashboard/statements" className="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-orange-50 transition-colors group">
+                    </Link>
+                    <Link href="/dashboard/statements" className="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-orange-50 transition-colors group">
                         <span className="text-3xl mb-2">📝</span>
                         <span className="text-sm text-gray-600 group-hover:text-orange-600">إضافة بيان</span>
-                    </a>
-                    <a href="/dashboard/landmarks" className="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-orange-50 transition-colors group">
+                    </Link>
+                    <Link href="/dashboard/landmarks" className="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-orange-50 transition-colors group">
                         <span className="text-3xl mb-2">🗺️</span>
                         <span className="text-sm text-gray-600 group-hover:text-orange-600">إضافة معلم</span>
-                    </a>
-                    <a href="/dashboard/complaints" className="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-orange-50 transition-colors group">
+                    </Link>
+                    <Link href="/dashboard/complaints" className="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-orange-50 transition-colors group">
                         <span className="text-3xl mb-2">📋</span>
                         <span className="text-sm text-gray-600 group-hover:text-orange-600">عرض الشكاوى</span>
-                    </a>
+                    </Link>
                 </div>
             </div>
         </div>

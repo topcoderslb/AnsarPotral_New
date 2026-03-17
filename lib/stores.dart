@@ -231,6 +231,27 @@ class _StoresPageState extends State<StoresPage> {
 
                         SizedBox(height: 8), // Reduced spacing
 
+                        // Location
+                        if (shop.location.isNotEmpty)
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 8),
+                            child: Row(
+                              children: [
+                                Icon(Icons.location_on, size: 18, color: Colors.deepOrange),
+                                SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    shop.location,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey.shade700,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
                         // Description
                         Text(
                           shop.description,
@@ -597,6 +618,29 @@ class _StoresPageState extends State<StoresPage> {
                 ),
 
                 SizedBox(height: 8),
+
+                // Location
+                if (shop.location.isNotEmpty)
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      children: [
+                        Icon(Icons.location_on, size: 16, color: Colors.deepOrange),
+                        SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            shop.location,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey.shade700,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
                 // Description
                 Text(

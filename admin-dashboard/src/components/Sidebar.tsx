@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 const menuItems = [
     { href: '/dashboard', icon: '🏠', label: 'الرئيسية', labelEn: 'Dashboard' },
     { href: '/dashboard/stores', icon: '🏬', label: 'المتاجر', labelEn: 'Stores' },
+    { href: '/dashboard/store-categories', icon: '🏷️', label: 'أصناف المتاجر', labelEn: 'Store Categories' },
     { href: '/dashboard/statements', icon: '📋', label: 'بيانات البلدية', labelEn: 'Statements' },
     { href: '/dashboard/landmarks', icon: '🏛️', label: 'المعالم', labelEn: 'Landmarks' },
     { href: '/dashboard/about', icon: '📖', label: 'عن البلدية', labelEn: 'About' },
