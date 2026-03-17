@@ -31,7 +31,7 @@ class _StoreDetailsPageState extends State<StoreDetailsPage> {
     try {
       final response = await http.get(
         Uri.parse(
-            '${ApiService.baseUrl}/stores.php?id=${widget.storeId}'),
+            '${ApiService.baseUrl}/stores?id=${widget.storeId}'),
       );
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);

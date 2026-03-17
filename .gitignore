@@ -48,8 +48,10 @@ admin-dashboard/.next/
 admin-dashboard/.env
 admin-dashboard/.env.local
 admin-dashboard/.env.production
+admin-dashboard/public/uploads/*
+!admin-dashboard/public/uploads/.gitkeep
 
-# Backend (PHP)
+# Backend (PHP) - legacy, kept for reference
 backend/uploads/*
 !backend/uploads/.htaccess
 

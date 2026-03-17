@@ -14,14 +14,14 @@ class ApiService {
   // Use 10.0.2.2 for Android emulator, localhost for web/desktop/iOS simulator
   static String get baseUrl {
     if (kIsWeb) {
-      return 'http://localhost/ansar_portal_api/api';
+      return 'http://localhost:3000/api';
     }
     // For Android emulator, 10.0.2.2 maps to host machine's localhost
     if (defaultTargetPlatform == TargetPlatform.android) {
-      return 'http://10.0.2.2/ansar_portal_api/api';
+      return 'http://10.0.2.2:3000/api';
     }
     // For desktop (Windows/macOS/Linux) and iOS simulator
-    return 'http://localhost/ansar_portal_api/api';
+    return 'http://localhost:3000/api';
   }
 
   // ============= STORES =============
@@ -29,7 +29,7 @@ class ApiService {
   Future<List<Map<String, dynamic>>> getStores() async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/stores.php?active_only=1'),
+        Uri.parse('$baseUrl/stores?active_only=1'),
       );
 
       if (response.statusCode == 200) {
@@ -47,7 +47,7 @@ class ApiService {
   Future<List<String>> getStoreCategories() async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/store-categories.php'),
+        Uri.parse('$baseUrl/store-categories'),
       );
 
       if (response.statusCode == 200) {
@@ -66,7 +66,7 @@ class ApiService {
   Future<List<Map<String, dynamic>>> getStatements() async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/statements.php?active_only=1'),
+        Uri.parse('$baseUrl/statements?active_only=1'),
       );
 
       if (response.statusCode == 200) {
@@ -83,7 +83,7 @@ class ApiService {
   Future<List<String>> getStatementCategories() async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/statement-categories.php'),
+        Uri.parse('$baseUrl/statement-categories'),
       );
 
       if (response.statusCode == 200) {
@@ -102,7 +102,7 @@ class ApiService {
   Future<List<Map<String, dynamic>>> getLandmarks() async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/landmarks.php?active_only=1'),
+        Uri.parse('$baseUrl/landmarks?active_only=1'),
       );
 
       if (response.statusCode == 200) {
@@ -119,7 +119,7 @@ class ApiService {
   Future<List<String>> getCarouselImages() async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/carousel.php?active_only=1'),
+        Uri.parse('$baseUrl/carousel?active_only=1'),
       );
 
       if (response.statusCode == 200) {
@@ -141,7 +141,7 @@ class ApiService {
   Future<List<Map<String, dynamic>>> getAboutSections() async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/about.php?active_only=1'),
+        Uri.parse('$baseUrl/about?active_only=1'),
       );
 
       if (response.statusCode == 200) {
@@ -165,7 +165,7 @@ class ApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/complaints.php'),
+        Uri.parse('$baseUrl/complaints'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'name': name,
@@ -187,7 +187,7 @@ class ApiService {
   Future<Map<String, dynamic>?> getAppSettings() async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/settings.php'),
+        Uri.parse('$baseUrl/settings'),
       );
 
       if (response.statusCode == 200) {
@@ -204,7 +204,7 @@ class ApiService {
 
   Future<String?> uploadImage(XFile imageFile) async {
     try {
-      final uri = Uri.parse('$baseUrl/upload.php');
+      final uri = Uri.parse('$baseUrl/upload');
       final request = http.MultipartRequest('POST', uri);
       final bytes = await imageFile.readAsBytes();
       request.files.add(

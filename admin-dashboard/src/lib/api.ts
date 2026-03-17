@@ -1,10 +1,12 @@
-// API client configuration - replaces Firebase
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost/ansar_portal_api';
+// API client configuration - uses Next.js API routes
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
 export const API_URL = API_BASE;
 
 export function getApiUrl(endpoint: string, params?: Record<string, string>): string {
-    const url = new URL(`${API_BASE}/api/${endpoint}`);
+    // Strip .php extension for Next.js API routes
+    const cleanEndpoint = endpoint.replace(/\.php$/, '');
+    const url = new URL(`${API_BASE}/api/${cleanEndpoint}`, window.location.origin);
     if (params) {
         Object.entries(params).forEach(([key, value]) => {
             url.searchParams.append(key, value);
