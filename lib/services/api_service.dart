@@ -1,4 +1,4 @@
-// API Service for Ansar Portal Flutter App
+// API Service for Ansar Flutter App
 // Handles all HTTP operations for fetching dynamic content from the backend
 
 import 'dart:convert';

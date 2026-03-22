@@ -253,6 +253,8 @@ flutter:
     - assets/ansar11.jpeg
     - assets/ansarportal.png
     - assets/abizarschool.jpg
+    - assets/APPBG.png
+    - assets/BG.png
   fonts:
     - family: kuro
       fonts:

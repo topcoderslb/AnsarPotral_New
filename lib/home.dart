@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:AnsarPortal/tourism.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -9,10 +10,11 @@ import 'municipality_statements.dart';
 import 'complaints.dart';
 import 'stores.dart';
 import 'about_municipality.dart';
-import 'modern_app_bar.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final void Function(int)? onNavigateToTab;
+
+  const HomePage({Key? key, this.onNavigateToTab}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -74,15 +76,29 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return Scaffold(
       body: Stack(
         children: [
-          // Restore original background image
+          // New background image
           Positioned.fill(
             child: Image.asset(
-              'assets/home-final.jpg',
+              'assets/BG.png',
               fit: BoxFit.cover,
             ),
           ),
-          Container(
-            color: Colors.black.withOpacity(0.2),
+          // Soft gradient overlay for readability
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.15),
+                    Colors.black.withOpacity(0.30),
+                    Colors.black.withOpacity(0.55),
+                  ],
+                  stops: const [0.0, 0.4, 1.0],
+                ),
+              ),
+            ),
           ),
 
           // Main content
@@ -99,13 +115,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       // Header section with animations
                       _buildAnimatedHeader(screenSize),
 
-                      // Welcome section
-                      Expanded(
-                        child: _buildWelcomeSection(screenSize),
-                      ),
+                      // Push buttons to bottom of screen
+                      const Spacer(flex: 10),
 
                       // Navigation cards section
                       _buildNavigationSection(screenSize),
+
+                      SizedBox(height: screenSize.height * 0.03),
                     ],
                   ),
                 ),
@@ -113,15 +129,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildAnimatedBackground() {
-    return Positioned.fill(
-      child: CustomPaint(
-        painter: BackgroundPainter(),
-        child: Container(),
       ),
     );
   }
@@ -137,7 +144,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Share button with glassmorphism effect
+              // Share button
               _buildGlassmorphicButton(
                 icon: Icons.share_rounded,
                 onPressed: () {
@@ -147,7 +154,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 screenSize: screenSize,
               ),
 
-              // Menu button with glassmorphism effect
+              // Menu button
               _buildGlassmorphicButton(
                 icon: Icons.menu_rounded,
                 onPressed: () => _showModernMenu(context),
@@ -165,37 +172,33 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     required VoidCallback onPressed,
     required Size screenSize,
   }) {
-    final buttonSize = screenSize.width * 0.12; // Responsive button size
+    final buttonSize = screenSize.width * 0.12;
 
-    return Container(
-      width: buttonSize,
-      height: buttonSize,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: Colors.white.withOpacity(0.15),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.3),
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          width: buttonSize,
+          height: buttonSize,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: Colors.white.withOpacity(0.15),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.3),
+              width: 1.5,
+            ),
           ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: onPressed,
-          child: Container(
-            padding: EdgeInsets.all(buttonSize * 0.25),
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: buttonSize * 0.4,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: onPressed,
+              child: Icon(
+                icon,
+                color: Colors.white,
+                size: buttonSize * 0.45,
+              ),
             ),
           ),
         ),
@@ -204,203 +207,119 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Widget _buildWelcomeSection(Size screenSize) {
-    return ScaleTransition(
-      scale: _scaleAnimation,
-      child: FadeTransition(
-        opacity: _fadeAnimation,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Logo with subtle glow
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.deepOrange.withOpacity(0.2),
-                      blurRadius: 20,
-                      spreadRadius: 2,
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: Image.asset(
-                    'assets/ansarportallogo.png',
-                    height: screenSize.height * 0.12, // Smaller logo
-                  ),
-                ),
-              ),
-
-              SizedBox(height: screenSize.height * 0.03),
-
-              // Modern welcome text design
-              Container(
-                margin:
-                    EdgeInsets.symmetric(horizontal: screenSize.width * 0.08),
-                child: Column(
-                  children: [
-                    // English text
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: screenSize.width * 0.05,
-                          vertical: screenSize.height * 0.01),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: Colors.deepOrange.withOpacity(0.9),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.deepOrange.withOpacity(0.3),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Text(
-                        'ANSAR PORTAL',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white,
-                          
-                          fontSize:
-                              screenSize.width * 0.045, // Responsive font size
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                    ),
-
-                    SizedBox(height: screenSize.height * 0.01),
-
-                    // Arabic text
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: screenSize.width * 0.05,
-                          vertical: screenSize.height * 0.01),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: Colors.white.withOpacity(0.9),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Text(
-                        'المنصّة الرقميّة لبلدية أنصار',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.tajawal(
-                          color: Colors.deepOrange,
-                          fontSize:
-                              screenSize.width * 0.04, // Responsive font size
-                          fontWeight: FontWeight.w700,
-                          height: 1.4,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    // Clean landing page — no text, no logo
+    return const SizedBox.shrink();
   }
 
   Widget _buildNavigationSection(Size screenSize) {
-    return Container(
+    final rowSpacing = screenSize.height * 0.04;
+    final colSpacing = screenSize.width * 0.05;
+
+    return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: screenSize.width * 0.04,
+        horizontal: screenSize.width * 0.06,
         vertical: screenSize.height * 0.02,
       ),
       child: Column(
         children: [
-          // First row - 2 buttons
+          // Row 1 — 3 items
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildModernNavigationCard(
-                icon: Icons.store_rounded,
-                label: 'STORES',
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const StoresPage()),
+              Expanded(
+                child: _buildFloatingButton(
+                  icon: Icons.store_rounded,
+                  label: 'المتاجر',
+                  onTap: () {
+                    if (widget.onNavigateToTab != null) {
+                      widget.onNavigateToTab!(1);
+                    } else {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const StoresPage()));
+                    }
+                  },
+                  delay: 0,
+                  screenSize: screenSize,
                 ),
-                delay: 0,
-                screenSize: screenSize,
               ),
-              _buildModernNavigationCard(
-                icon: Icons.description_rounded,
-                label: 'بيانات البلدية',
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const MunicipalityStatementsPage()),
+              SizedBox(width: colSpacing),
+              Expanded(
+                child: _buildFloatingButton(
+                  icon: Icons.description_rounded,
+                  label: 'بيانات البلدية',
+                  onTap: () {
+                    if (widget.onNavigateToTab != null) {
+                      widget.onNavigateToTab!(2);
+                    } else {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const MunicipalityStatementsPage()));
+                    }
+                  },
+                  delay: 100,
+                  screenSize: screenSize,
                 ),
-                delay: 100,
-                screenSize: screenSize,
+              ),
+              SizedBox(width: colSpacing),
+              Expanded(
+                child: _buildFloatingButton(
+                  icon: Icons.feedback_rounded,
+                  label: 'تقديم الشكاوى',
+                  onTap: () {
+                    if (widget.onNavigateToTab != null) {
+                      widget.onNavigateToTab!(3);
+                    } else {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const ComplaintsPage()));
+                    }
+                  },
+                  delay: 200,
+                  screenSize: screenSize,
+                ),
               ),
             ],
           ),
 
-          SizedBox(height: screenSize.height * 0.02),
+          SizedBox(height: rowSpacing),
 
-          // Second row - 2 buttons
+          // Row 2 — 2 items centered
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildModernNavigationCard(
-                icon: Icons.feedback_rounded,
-                label: 'تقديم الشكاوى',
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const ComplaintsPage()),
+              SizedBox(
+                width: (screenSize.width - screenSize.width * 0.12 - colSpacing) / 3,
+                child: _buildFloatingButton(
+                  icon: FontAwesomeIcons.buildingColumns,
+                  label: 'أنصار',
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => TourismPage()),
+                  ),
+                  delay: 300,
+                  isFontAwesome: true,
+                  screenSize: screenSize,
                 ),
-                delay: 200,
-                screenSize: screenSize,
               ),
-              _buildModernNavigationCard(
-                icon: FontAwesomeIcons.buildingColumns,
-                label: 'ANSAR',
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => TourismPage()),
+              SizedBox(width: colSpacing),
+              SizedBox(
+                width: (screenSize.width - screenSize.width * 0.12 - colSpacing) / 3,
+                child: _buildFloatingButton(
+                  icon: Icons.info_rounded,
+                  label: 'عن البلدية',
+                  onTap: () {
+                    if (widget.onNavigateToTab != null) {
+                      widget.onNavigateToTab!(4);
+                    } else {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutMunicipalityPage()));
+                    }
+                  },
+                  delay: 400,
+                  screenSize: screenSize,
                 ),
-                delay: 300,
-                isFontAwesome: true,
-                screenSize: screenSize,
               ),
             ],
-          ),
-
-          SizedBox(height: screenSize.height * 0.02),
-
-          // Third row - single centered button
-          Center(
-            child: _buildModernNavigationCard(
-              icon: Icons.info_rounded,
-              label: 'عن البلدية',
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const AboutMunicipalityPage()),
-              ),
-              delay: 400,
-              screenSize: screenSize,
-            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildModernNavigationCard({
+  Widget _buildFloatingButton({
     required IconData icon,
     required String label,
     required VoidCallback onTap,
@@ -408,160 +327,92 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     bool isFontAwesome = false,
     required Size screenSize,
   }) {
-    // Bigger sizing for better usability - 14% of screen height
-    final cardHeight = screenSize.height * 0.14;
-    final cardWidth = screenSize.width * 0.42;
-    final iconSize = cardHeight * 0.35;
-    final fontSize = screenSize.width * 0.035;
+    final iconSize = screenSize.width * 0.075;
+    final fontSize = (screenSize.width * 0.034).clamp(12.0, 15.0);
 
     return TweenAnimationBuilder<double>(
-      duration: Duration(milliseconds: 400 + delay),
+      duration: Duration(milliseconds: 500 + delay),
       tween: Tween(begin: 0.0, end: 1.0),
       curve: Curves.easeOutCubic,
       builder: (context, value, child) {
         return Transform.translate(
-          offset: Offset(0, 20 * (1 - value)),
+          offset: Offset(0, 24 * (1 - value)),
           child: Opacity(
             opacity: value,
-            child: Container(
-              width: cardWidth,
-              height: cardHeight,
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(16),
-                  onTap: onTap,
-                  child: Container(
+            child: _PressableCard(
+              onTap: onTap,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Icon with subtle glow
+                  Container(
+                    width: iconSize * 1.8,
+                    height: iconSize * 1.8,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.white.withOpacity(0.25),
-                          Colors.white.withOpacity(0.20),
-                        ],
-                      ),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.5),
-                        width: 2,
-                      ),
+                      shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
-                          spreadRadius: 0,
-                        ),
-                        BoxShadow(
-                          color: Colors.deepOrange.withOpacity(0.2),
-                          blurRadius: 30,
-                          offset: const Offset(0, 5),
-                          spreadRadius: -5,
+                          color: Colors.deepOrange.withOpacity(0.3),
+                          blurRadius: 18,
+                          spreadRadius: 1,
                         ),
                       ],
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Stack(
-                        children: [
-                          // Subtle gradient overlay
-                          Positioned(
-                            top: -50,
-                            right: -50,
-                            child: Container(
-                              width: 150,
-                              height: 150,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: RadialGradient(
-                                  colors: [
-                                    Colors.white.withOpacity(0.1),
-                                    Colors.transparent,
-                                  ],
+                    child: Center(
+                      child: isFontAwesome
+                          ? FaIcon(
+                              icon,
+                              size: iconSize,
+                              color: Colors.white,
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black.withOpacity(0.5),
+                                  offset: const Offset(0, 2),
+                                  blurRadius: 8,
                                 ),
-                              ),
-                            ),
-                          ),
-                          
-                          // Centered content
-                          Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                // Icon section with refined styling
-                                Container(
-                                  width: cardHeight * 0.42,
-                                  height: cardHeight * 0.42,
-                                  margin: EdgeInsets.only(bottom: cardHeight * 0.10),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(18),
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                      colors: [
-                                        const Color(0xFFFF5722),
-                                        const Color(0xFFE64A19),
-                                      ],
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.deepOrange.withOpacity(0.4),
-                                        blurRadius: 12,
-                                        offset: const Offset(0, 6),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Center(
-                                    child: isFontAwesome
-                                        ? FaIcon(
-                                            icon as IconData,
-                                            size: iconSize,
-                                            color: Colors.white,
-                                          )
-                                        : Icon(
-                                            icon,
-                                            size: iconSize,
-                                            color: Colors.white,
-                                          ),
-                                  ),
-                                ),
-
-                                // Text section with professional Arabic font
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: cardHeight * 0.1),
-                                  child: Text(
-                                    label,
-                                    style: GoogleFonts.tajawal(
-                                      color: Colors.white,
-                                      fontSize: fontSize,
-                                      fontWeight: FontWeight.w700,
-                                      height: 1.3,
-                                      letterSpacing: 0.5,
-                                      shadows: [
-                                        Shadow(
-                                          color: Colors.black.withOpacity(0.5),
-                                          offset: const Offset(0, 2),
-                                          blurRadius: 4,
-                                        ),
-                                      ],
-                                    ),
-                                    textAlign: TextAlign.center,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
+                              ],
+                            )
+                          : Icon(
+                              icon,
+                              size: iconSize,
+                              color: Colors.white,
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black.withOpacity(0.5),
+                                  offset: const Offset(0, 2),
+                                  blurRadius: 8,
                                 ),
                               ],
                             ),
-                          ),
-                        ],
-                      ),
                     ),
                   ),
-                ),
+                  const SizedBox(height: 10),
+                  // Label
+                  Text(
+                    label,
+                    style: GoogleFonts.tajawal(
+                      color: Colors.white,
+                      fontSize: fontSize,
+                      fontWeight: FontWeight.w600,
+                      height: 1.3,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withOpacity(0.7),
+                          offset: const Offset(0, 1),
+                          blurRadius: 6,
+                        ),
+                        Shadow(
+                          color: Colors.black.withOpacity(0.3),
+                          offset: const Offset(0, 2),
+                          blurRadius: 12,
+                        ),
+                      ],
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
             ),
           ),
@@ -576,56 +427,55 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       builder: (BuildContext context) {
         return Dialog(
           backgroundColor: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.white.withOpacity(0.95),
-                  Colors.white.withOpacity(0.9),
-                ],
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.white.withOpacity(0.92),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildModernMenuItem(
+                      icon: Icons.info_rounded,
+                      title: 'Our Service',
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        _showOurServiceDialog(context);
+                      },
+                    ),
+                    Divider(height: 1, color: Colors.grey.shade200),
+                    _buildModernMenuItem(
+                      icon: Icons.supervised_user_circle_rounded,
+                      title: 'About Us',
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        _showAboutUsDialog(context);
+                      },
+                    ),
+                    Divider(height: 1, color: Colors.grey.shade200),
+                    _buildModernMenuItem(
+                      icon: Icons.email_rounded,
+                      title: 'Contact Us',
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        _launchEmail();
+                      },
+                    ),
+                  ],
+                ),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildModernMenuItem(
-                  icon: Icons.info_rounded,
-                  title: 'Our Service',
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    _showOurServiceDialog(context);
-                  },
-                ),
-                const Divider(height: 1),
-                _buildModernMenuItem(
-                  icon: Icons.supervised_user_circle_rounded,
-                  title: 'About Us',
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    _showAboutUsDialog(context);
-                  },
-                ),
-                const Divider(height: 1),
-                _buildModernMenuItem(
-                  icon: Icons.email_rounded,
-                  title: 'Contact Us',
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    _launchEmail();
-                  },
-                ),
-              ],
             ),
           ),
         );
@@ -644,27 +494,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         borderRadius: BorderRadius.circular(12),
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
                   color: Colors.deepOrange.withOpacity(0.1),
                 ),
-                child: Icon(
-                  icon,
-                  color: Colors.deepOrange,
-                  size: 20,
-                ),
+                child: Icon(icon, color: Colors.deepOrange, size: 20),
               ),
               const SizedBox(width: 16),
               Text(
                 title,
                 style: const TextStyle(
                   color: Colors.black87,
-                  
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
@@ -690,21 +535,33 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         final imgSize = constraints.maxWidth * 0.45;
         return Column(
           children: [
-            ClipOval(
-              child: Image.asset(
-                imageUrl,
-                fit: BoxFit.cover,
-                width: imgSize.clamp(80.0, 200.0),
-                height: imgSize.clamp(80.0, 200.0),
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ClipOval(
+                child: Image.asset(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  width: imgSize.clamp(80.0, 200.0),
+                  height: imgSize.clamp(80.0, 200.0),
+                ),
               ),
             ),
-            SizedBox(height: 15.0),
+            const SizedBox(height: 15.0),
             Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
-                
                 fontSize: 16.0,
+                color: Colors.black87,
               ),
               textAlign: TextAlign.center,
             ),
@@ -720,100 +577,98 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       builder: (BuildContext context) {
         return Dialog(
           backgroundColor: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.white.withOpacity(0.95),
-                  Colors.white.withOpacity(0.9),
-                ],
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.white.withOpacity(0.94),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'ANSAR PORTAL',
-                  style: TextStyle(
-                    
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.deepOrange,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Flexible(
-                  child: SingleChildScrollView(
-                    child: Text(
-                      "أهلاً بكم في بوابة أنصار، تطبيقكم الأمثل لاكتشاف كل ما هو جديد ومميز في أنصار ! نقدم لكم منصة شاملة تعرض أحدث الأخبار، العروض الحصرية، ومعلومات عن جميع المتاجر المحلية. تم تصميم بوابة أنصار لتجعل حياتكم أسهل، حيث يمكنكم العثور على كل ما تحتاجونه بلمسة زر. نهدف إلى تعزيز التجارة المحلية ودعم الاقتصاد في أنصار من خلال تسهيل الوصول إلى المعلومات والعروض التي تهمكم. انضموا إلينا الآن وكونوا جزءًا من مجتمع بوابة أنصار!",
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'ANSAR',
                       style: TextStyle(
-                        
-                        fontSize: 16,
-                        height: 1.5,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.deepOrange,
+                        letterSpacing: 2,
                       ),
-                      textAlign: TextAlign.center,
                     ),
-                  ),
+                    const SizedBox(height: 20),
+                    Flexible(
+                      child: SingleChildScrollView(
+                        child: Text(
+                          "أهلاً بكم في بوابة أنصار، تطبيقكم الأمثل لاكتشاف كل ما هو جديد ومميز في أنصار ! نقدم لكم منصة شاملة تعرض أحدث الأخبار، العروض الحصرية، ومعلومات عن جميع المتاجر المحلية. تم تصميم بوابة أنصار لتجعل حياتكم أسهل، حيث يمكنكم العثور على كل ما تحتاجونه بلمسة زر. نهدف إلى تعزيز التجارة المحلية ودعم الاقتصاد في أنصار من خلال تسهيل الوصول إلى المعلومات والعروض التي تهمكم. انضموا إلينا الآن وكونوا جزءًا من مجتمع أنصار!",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            height: 1.5,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width * 0.7,
+                            maxHeight: MediaQuery.of(context).size.height * 0.2,
+                          ),
+                          child: Image.asset(
+                            'assets/ansar11.jpeg',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepOrange,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 30, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        elevation: 4,
+                      ),
+                      child: const Text(
+                        'OK',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 20),
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * 0.7,
-                        maxHeight: MediaQuery.of(context).size.height * 0.2,
-                      ),
-                      child: Image.asset(
-                        'assets/ansar11.jpeg',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 30, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                  ),
-                  child: const Text(
-                    'OK',
-                    style: TextStyle(
-                      
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         );
@@ -827,75 +682,74 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       builder: (BuildContext context) {
         return Dialog(
           backgroundColor: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.white.withOpacity(0.95),
-                  Colors.white.withOpacity(0.9),
-                ],
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.white.withOpacity(0.94),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'TopCoders\n Software Company',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.deepOrange,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Flexible(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            _buildPlaceCard(
+                                'Mahdi Fadel Assi - "CEO"', 'assets/mahdi.jpeg'),
+                            const SizedBox(height: 20),
+                            _buildPlaceCard(
+                                'Hadi Ahmad Makki - "CTO"', 'assets/hadi.png'),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepOrange,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 30, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        elevation: 4,
+                      ),
+                      child: const Text(
+                        'Close',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'TopCoders\n Software Company',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.deepOrange,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Flexible(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        _buildPlaceCard(
-                            'Mahdi Fadel Assi - "CEO"', 'assets/mahdi.jpeg'),
-                        const SizedBox(height: 20),
-                        _buildPlaceCard(
-                            'Hadi Ahmad Makki - "CTO"', 'assets/hadi.png'),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 30, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                  ),
-                  child: const Text(
-                    'Close',
-                    style: TextStyle(
-                      
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
             ),
           ),
         );
@@ -908,29 +762,59 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       scheme: 'mailto',
       path: 'topcoders.lb@gmail.com',
       query: encodeQueryParameters(<String, String>{
-        'subject': 'Inquiry from Ansar Portal',
+        'subject': 'Inquiry from Ansar',
       }),
     );
     launchUrl(emailLaunchUri);
   }
 }
 
-// Custom painter for animated background
-class BackgroundPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withOpacity(0.05)
-      ..style = PaintingStyle.fill;
+class _PressableCard extends StatefulWidget {
+  final Widget child;
+  final VoidCallback onTap;
 
-    // Draw animated circles
-    for (int i = 0; i < 5; i++) {
-      final x = (size.width * 0.2) + (i * size.width * 0.15);
-      final y = (size.height * 0.1) + (i * size.height * 0.2);
-      canvas.drawCircle(Offset(x, y), 50 + (i * 20), paint);
-    }
+  const _PressableCard({required this.child, required this.onTap});
+
+  @override
+  State<_PressableCard> createState() => _PressableCardState();
+}
+
+class _PressableCardState extends State<_PressableCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scale;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 120),
+    );
+    _scale = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => _controller.forward(),
+      onTapUp: (_) {
+        _controller.reverse();
+        widget.onTap();
+      },
+      onTapCancel: () => _controller.reverse(),
+      child: ScaleTransition(
+        scale: _scale,
+        child: widget.child,
+      ),
+    );
+  }
 }

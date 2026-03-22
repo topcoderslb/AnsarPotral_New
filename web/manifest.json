@@ -1,6 +1,6 @@
 {
-    "name": "ansar_portal_mobile_app",
-    "short_name": "ansar_portal_mobile_app",
+    "name": "Ansar",
+    "short_name": "Ansar",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
