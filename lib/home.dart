@@ -10,6 +10,7 @@ import 'municipality_statements.dart';
 import 'complaints.dart';
 import 'stores.dart';
 import 'about_municipality.dart';
+import 'last_news.dart';
 
 class HomePage extends StatefulWidget {
   final void Function(int)? onNavigateToTab;
@@ -233,7 +234,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     if (widget.onNavigateToTab != null) {
                       widget.onNavigateToTab!(1);
                     } else {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const StoresPage()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const StoresPage()));
                     }
                   },
                   delay: 0,
@@ -249,7 +253,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     if (widget.onNavigateToTab != null) {
                       widget.onNavigateToTab!(2);
                     } else {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const MunicipalityStatementsPage()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const MunicipalityStatementsPage()));
                     }
                   },
                   delay: 100,
@@ -265,7 +273,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     if (widget.onNavigateToTab != null) {
                       widget.onNavigateToTab!(3);
                     } else {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const ComplaintsPage()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const ComplaintsPage()));
                     }
                   },
                   delay: 200,
@@ -277,12 +288,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
           SizedBox(height: rowSpacing),
 
-          // Row 2 — 2 items centered
+          // Row 2 — 3 items
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(
-                width: (screenSize.width - screenSize.width * 0.12 - colSpacing) / 3,
+                width: (screenSize.width -
+                        screenSize.width * 0.12 -
+                        colSpacing * 2) /
+                    3,
                 child: _buildFloatingButton(
                   icon: FontAwesomeIcons.buildingColumns,
                   label: 'أنصار',
@@ -297,7 +311,33 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ),
               SizedBox(width: colSpacing),
               SizedBox(
-                width: (screenSize.width - screenSize.width * 0.12 - colSpacing) / 3,
+                width: (screenSize.width -
+                        screenSize.width * 0.12 -
+                        colSpacing * 2) /
+                    3,
+                child: _buildFloatingButton(
+                  icon: Icons.newspaper_rounded,
+                  label: 'آخر الأخبار',
+                  onTap: () {
+                    if (widget.onNavigateToTab != null) {
+                      widget.onNavigateToTab!(5);
+                    } else {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LastNewsPage()));
+                    }
+                  },
+                  delay: 400,
+                  screenSize: screenSize,
+                ),
+              ),
+              SizedBox(width: colSpacing),
+              SizedBox(
+                width: (screenSize.width -
+                        screenSize.width * 0.12 -
+                        colSpacing * 2) /
+                    3,
                 child: _buildFloatingButton(
                   icon: Icons.info_rounded,
                   label: 'عن البلدية',
@@ -305,10 +345,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     if (widget.onNavigateToTab != null) {
                       widget.onNavigateToTab!(4);
                     } else {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutMunicipalityPage()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const AboutMunicipalityPage()));
                     }
                   },
-                  delay: 400,
+                  delay: 500,
                   screenSize: screenSize,
                 ),
               ),
@@ -717,8 +761,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       child: SingleChildScrollView(
                         child: Column(
                           children: [
-                            _buildPlaceCard(
-                                'Mahdi Fadel Assi - "CEO"', 'assets/mahdi.jpeg'),
+                            _buildPlaceCard('Mahdi Fadel Assi - "CEO"',
+                                'assets/mahdi.jpeg'),
                             const SizedBox(height: 20),
                             _buildPlaceCard(
                                 'Hadi Ahmad Makki - "CTO"', 'assets/hadi.png'),

@@ -60,84 +60,86 @@ class _TourismPageState extends State<TourismPage> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           final screenHeight = constraints.maxHeight;
-          final carouselHeight = (screenHeight * 0.4).clamp(200.0, 400.0);
+          final carouselHeight = (screenHeight * 0.58).clamp(300.0, 560.0);
           return ListView(
-        children: [
-          // Section 1: About Ansar - Modern Carousel Slider
-          if (_carouselImages.isNotEmpty)
-            Container(
-              margin: EdgeInsets.symmetric(vertical: 16, horizontal: 10),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
-                    blurRadius: 20,
-                    offset: Offset(0, 10),
-                    spreadRadius: 2,
+            children: [
+              // Section 1: About Ansar - Modern Carousel Slider
+              if (_carouselImages.isNotEmpty)
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 16, horizontal: 10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.15),
+                        blurRadius: 20,
+                        offset: Offset(0, 10),
+                        spreadRadius: 2,
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: carousel.CarouselSlider(
-                  options: carousel.CarouselOptions(
-                    aspectRatio: 4 / 4.5,
-                    autoPlay: true,
-                    autoPlayInterval: Duration(seconds: 4),
-                    autoPlayAnimationDuration: Duration(milliseconds: 1000),
-                    autoPlayCurve: Curves.easeInOutCubic,
-                    enlargeCenterPage: true,
-                    viewportFraction: 0.85,
-                    height: carouselHeight,
-                  ),
-                  items: _carouselImages.map((imageUrl) {
-                    return _buildModernCarouselItem(imageUrl);
-                  }).toList(),
-                ),
-              ),
-            ),
-          SizedBox(height: 10),
-          // Section 2: Places or Monuments - Cards
-          Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Text(
-                    'معالم انصار',
-                    style: TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.bold,
-                      
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: carousel.CarouselSlider(
+                      options: carousel.CarouselOptions(
+                        aspectRatio: 4 / 5.5,
+                        autoPlay: true,
+                        autoPlayInterval: Duration(seconds: 4),
+                        autoPlayAnimationDuration: Duration(milliseconds: 1000),
+                        autoPlayCurve: Curves.easeInOutCubic,
+                        enlargeCenterPage: true,
+                        viewportFraction: 0.85,
+                        height: carouselHeight,
+                      ),
+                      items: _carouselImages.map((imageUrl) {
+                        return _buildModernCarouselItem(imageUrl);
+                      }).toList(),
                     ),
                   ),
                 ),
-                SizedBox(height: 16.0),
-                ..._landmarks.map((landmark) {
-                  final name = landmark['name'] ?? landmark['title'] ?? '';
-                  final imageUrl = landmark['image_url'] ?? landmark['imageUrl'] ?? '';
-                  final phone = landmark['phone_number'] ?? landmark['phoneNumber'] ?? '';
-                  final hasCall = landmark['has_call_button'] == true ||
-                      landmark['has_call_button'] == 1 ||
-                      landmark['hasCallButton'] == true;
+              SizedBox(height: 10),
+              // Section 2: Places or Monuments - Cards
+              Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Text(
+                        'معالم انصار',
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 16.0),
+                    ..._landmarks.map((landmark) {
+                      final name = landmark['name'] ?? landmark['title'] ?? '';
+                      final imageUrl =
+                          landmark['image_url'] ?? landmark['imageUrl'] ?? '';
+                      final phone = landmark['phone_number'] ??
+                          landmark['phoneNumber'] ??
+                          '';
+                      final hasCall = landmark['has_call_button'] == true ||
+                          landmark['has_call_button'] == 1 ||
+                          landmark['hasCallButton'] == true;
 
-                  return Column(
-                    children: [
-                      if (hasCall && phone.isNotEmpty)
-                        _buildPlaceCardWithCall(name, imageUrl, phone)
-                      else
-                        _buildPlaceCard(name, imageUrl),
-                      SizedBox(height: 16.0),
-                    ],
-                  );
-                }).toList(),
-              ],
-            ),
-          ),
-        ],
-      );
+                      return Column(
+                        children: [
+                          if (hasCall && phone.isNotEmpty)
+                            _buildPlaceCardWithCall(name, imageUrl, phone)
+                          else
+                            _buildPlaceCard(name, imageUrl),
+                          SizedBox(height: 16.0),
+                        ],
+                      );
+                    }).toList(),
+                  ],
+                ),
+              ),
+            ],
+          );
         },
       ),
     );
@@ -171,7 +173,8 @@ class _TourismPageState extends State<TourismPage> {
                   color: Colors.grey.shade300,
                   child: Center(
                     child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.deepOrange),
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(Colors.deepOrange),
                     ),
                   ),
                 ),
@@ -200,7 +203,8 @@ class _TourismPageState extends State<TourismPage> {
     );
   }
 
-  Widget _buildPlaceCardWithCall(String title, String imageUrl, String phoneNumber) {
+  Widget _buildPlaceCardWithCall(
+      String title, String imageUrl, String phoneNumber) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -222,14 +226,16 @@ class _TourismPageState extends State<TourismPage> {
                   color: Colors.grey.shade300,
                   child: Center(
                     child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.deepOrange),
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(Colors.deepOrange),
                     ),
                   ),
                 ),
                 errorWidget: (context, url, error) => Container(
                   height: 200,
                   color: Colors.grey.shade300,
-                  child: Icon(Icons.image_not_supported, color: Colors.grey.shade600, size: 40),
+                  child: Icon(Icons.image_not_supported,
+                      color: Colors.grey.shade600, size: 40),
                 ),
               ),
             )
@@ -237,7 +243,8 @@ class _TourismPageState extends State<TourismPage> {
             Container(
               height: 150,
               color: Colors.grey.shade200,
-              child: Icon(Icons.landscape, color: Colors.grey.shade400, size: 48),
+              child:
+                  Icon(Icons.landscape, color: Colors.grey.shade400, size: 48),
             ),
           Padding(
             padding: EdgeInsets.all(8.0),
@@ -270,7 +277,8 @@ class _TourismPageState extends State<TourismPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     ),
                   ),
                 ),
@@ -304,14 +312,16 @@ class _TourismPageState extends State<TourismPage> {
                   color: Colors.grey.shade300,
                   child: Center(
                     child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.deepOrange),
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(Colors.deepOrange),
                     ),
                   ),
                 ),
                 errorWidget: (context, url, error) => Container(
                   height: 200,
                   color: Colors.grey.shade300,
-                  child: Icon(Icons.image_not_supported, color: Colors.grey.shade600, size: 40),
+                  child: Icon(Icons.image_not_supported,
+                      color: Colors.grey.shade600, size: 40),
                 ),
               ),
             )
@@ -319,7 +329,8 @@ class _TourismPageState extends State<TourismPage> {
             Container(
               height: 150,
               color: Colors.grey.shade200,
-              child: Icon(Icons.landscape, color: Colors.grey.shade400, size: 48),
+              child:
+                  Icon(Icons.landscape, color: Colors.grey.shade400, size: 48),
             ),
           Padding(
             padding: EdgeInsets.all(8.0),
@@ -353,4 +364,3 @@ class _TourismPageState extends State<TourismPage> {
     }
   }
 }
-

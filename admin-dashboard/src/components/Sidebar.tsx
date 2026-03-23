@@ -10,6 +10,7 @@ const menuItems = [
     { href: '/dashboard/store-categories', icon: '🏷️', label: 'أصناف المتاجر', labelEn: 'Store Categories' },
     { href: '/dashboard/statements', icon: '📋', label: 'بيانات البلدية', labelEn: 'Statements' },
     { href: '/dashboard/landmarks', icon: '🏛️', label: 'المعالم', labelEn: 'Landmarks' },
+    { href: '/dashboard/news', icon: '📰', label: 'آخر الأخبار', labelEn: 'News' },
     { href: '/dashboard/about', icon: '📖', label: 'عن البلدية', labelEn: 'About' },
     { href: '/dashboard/complaints', icon: '📨', label: 'الشكاوى', labelEn: 'Complaints' },
     { href: '/dashboard/settings', icon: '⚙️', label: 'الإعدادات', labelEn: 'Settings' },

@@ -24,29 +24,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Verify existing token on load
         const token = getToken();
-        if (token) {
-            fetch(getApiUrl('auth.php', { action: 'verify' }), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success && data.user) {
-                        setUser(data.user);
-                    } else {
-                        removeToken();
-                    }
-                })
-                .catch(() => removeToken())
-                .finally(() => setLoading(false));
-        } else {
+
+        if (!token) {
             setLoading(false);
+            return;
         }
+
+        // Immediately restore from cache so the dashboard never flickers to login
+        const savedUser = localStorage.getItem('auth_user');
+        if (savedUser) {
+            try {
+                setUser(JSON.parse(savedUser));
+                setLoading(false); // show content right away
+            } catch {
+                // corrupt cache — will be fixed by verify below
+            }
+        }
+
+        // Verify token in background
+        fetch(getApiUrl('auth.php', { action: 'verify' }), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.user) {
+                    setUser(data.user);
+                    localStorage.setItem('auth_user', JSON.stringify(data.user));
+                } else {
+                    // Token definitively rejected by server — log out
+                    removeToken();
+                    localStorage.removeItem('auth_user');
+                    setUser(null);
+                }
+            })
+            .catch(() => {
+                // Network error — keep the cached user; don't force logout
+            })
+            .finally(() => setLoading(false));
     }, []);
 
     const signIn = async (email: string, password: string) => {
@@ -63,16 +82,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         setToken(data.token);
-        setUser({
+        const authUser = {
             user_id: data.user.id,
             email: data.user.email,
             name: data.user.name,
             role: data.user.role,
-        });
+        };
+        localStorage.setItem('auth_user', JSON.stringify(authUser));
+        setUser(authUser);
     };
 
     const signOut = async () => {
         removeToken();
+        localStorage.removeItem('auth_user');
         setUser(null);
     };
 

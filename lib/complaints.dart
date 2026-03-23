@@ -24,7 +24,7 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    
+
     if (image != null) {
       setState(() {
         _selectedImage = image;
@@ -79,7 +79,6 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                     Text(
                       'تم الإرسال بنجاح',
                       style: TextStyle(
-                        
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -99,7 +98,6 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                       'حسناً',
                       style: TextStyle(
                         color: Colors.deepOrange,
-                        
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -138,7 +136,7 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ModernAppBar(title: 'تقديم الشكاوى'),
+      appBar: ModernAppBar(title: 'تقديم الشكاوى', showBackButton: false),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
         child: Form(
@@ -179,7 +177,6 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey.shade600,
-                        
                       ),
                     ),
                   ],
@@ -298,12 +295,10 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        
                         color: Colors.deepOrange.shade700,
                       ),
                     ),
                     SizedBox(height: 12),
-                    
                     if (_selectedImage == null)
                       ElevatedButton.icon(
                         onPressed: _pickImage,
@@ -312,7 +307,6 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                           'اختيار صورة',
                           style: TextStyle(
                             color: Colors.white,
-                            
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -337,16 +331,19 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(8),
                               child: kIsWeb
-                                ? Image.network(
-                                    _selectedImage!.path,
-                                    fit: BoxFit.cover,
-                                  )
-                                : Image.network(
-                                    _selectedImage!.path,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) =>
-                                        Icon(Icons.image, size: 50, color: Colors.grey),
-                                  ),
+                                  ? Image.network(
+                                      _selectedImage!.path,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Image.network(
+                                      _selectedImage!.path,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) => Icon(
+                                              Icons.image,
+                                              size: 50,
+                                              color: Colors.grey),
+                                    ),
                             ),
                           ),
                           SizedBox(height: 8),
@@ -355,12 +352,12 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                               Expanded(
                                 child: ElevatedButton.icon(
                                   onPressed: _pickImage,
-                                  icon: Icon(Icons.edit, color: Colors.white, size: 16),
+                                  icon: Icon(Icons.edit,
+                                      color: Colors.white, size: 16),
                                   label: Text(
                                     'تغيير الصورة',
                                     style: TextStyle(
                                       color: Colors.white,
-                                      
                                       fontSize: 12,
                                     ),
                                   ),
@@ -377,12 +374,12 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                               Expanded(
                                 child: ElevatedButton.icon(
                                   onPressed: _removeImage,
-                                  icon: Icon(Icons.delete, color: Colors.white, size: 16),
+                                  icon: Icon(Icons.delete,
+                                      color: Colors.white, size: 16),
                                   label: Text(
                                     'حذف الصورة',
                                     style: TextStyle(
                                       color: Colors.white,
-                                      
                                       fontSize: 12,
                                     ),
                                   ),
@@ -424,7 +421,8 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                             height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
                             ),
                           ),
                           SizedBox(width: 12),
@@ -432,7 +430,6 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                             'جاري الإرسال...',
                             style: TextStyle(
                               color: Colors.white,
-                              
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
                             ),
@@ -443,7 +440,6 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                         'إرسال الشكوى',
                         style: TextStyle(
                           color: Colors.white,
-                          
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
@@ -466,7 +462,6 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                   'إعادة تعيين النموذج',
                   style: TextStyle(
                     color: Colors.deepOrange,
-                    
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
@@ -486,4 +481,4 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
     _complaintController.dispose();
     super.dispose();
   }
-} 
+}

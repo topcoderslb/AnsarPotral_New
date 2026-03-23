@@ -85,6 +85,17 @@ export async function GET() {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB`);
 
+    await pool.query(`CREATE TABLE IF NOT EXISTS news (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      title VARCHAR(500) NOT NULL,
+      content TEXT NOT NULL,
+      image_url TEXT,
+      is_active TINYINT(1) NOT NULL DEFAULT 1,
+      published_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB`);
+
     await pool.query(`CREATE TABLE IF NOT EXISTS about_sections (
       id INT AUTO_INCREMENT PRIMARY KEY,
       title VARCHAR(255) NOT NULL,
@@ -148,7 +159,7 @@ export async function GET() {
         tables_created: [
           'users', 'stores', 'store_categories',
           'statements', 'statement_images', 'statement_categories',
-          'landmarks', 'carousel_images',
+          'landmarks', 'carousel_images', 'news',
           'about_sections', 'about_section_content',
           'complaints', 'app_settings',
         ],

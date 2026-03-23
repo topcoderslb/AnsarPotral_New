@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:flutter/foundation.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'home.dart';
 import 'stores.dart';
 import 'municipality_statements.dart';
 import 'complaints.dart';
 import 'about_municipality.dart';
+import 'last_news.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -109,78 +109,99 @@ class _MainShellState extends State<MainShell> {
   void initState() {
     super.initState();
     _pages.addAll([
-      HomePage(onNavigateToTab: (index) => setState(() => _currentIndex = index)),
+      HomePage(
+          onNavigateToTab: (index) => setState(() => _currentIndex = index)),
       const StoresPage(),
       const MunicipalityStatementsPage(),
       const ComplaintsPage(),
       const AboutMunicipalityPage(),
+      const LastNewsPage(),
     ]);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _pages,
-      ),
-      bottomNavigationBar: _currentIndex == 0
-          ? null
-          : Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 20,
-              offset: const Offset(0, -4),
-            ),
-          ],
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+    return PopScope(
+      // Allow natural back (exit) only when on the home tab
+      canPop: _currentIndex == 0,
+      onPopInvoked: (didPop) {
+        if (!didPop) {
+          // Back pressed on a non-home tab → go home
+          setState(() => _currentIndex = 0);
+        }
+      },
+      child: Scaffold(
+        body: IndexedStack(
+          index: _currentIndex,
+          children: _pages,
         ),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          child: BottomNavigationBar(
-            currentIndex: _currentIndex,
-            onTap: (index) => setState(() => _currentIndex = index),
-            type: BottomNavigationBarType.fixed,
-            backgroundColor: Colors.white,
-            selectedItemColor: Colors.deepOrange,
-            unselectedItemColor: Colors.grey.shade400,
-            selectedFontSize: 11,
-            unselectedFontSize: 10,
-            elevation: 0,
-            selectedLabelStyle: GoogleFonts.tajawal(fontWeight: FontWeight.w700),
-            unselectedLabelStyle: GoogleFonts.tajawal(fontWeight: FontWeight.w500),
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home_rounded),
-                activeIcon: Icon(Icons.home_rounded, size: 28),
-                label: 'الرئيسية',
+        bottomNavigationBar: _currentIndex == 0
+            ? null
+            : Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 20,
+                      offset: const Offset(0, -4),
+                    ),
+                  ],
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                child: ClipRRect(
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(20)),
+                  child: BottomNavigationBar(
+                    currentIndex: _currentIndex,
+                    onTap: (index) => setState(() => _currentIndex = index),
+                    type: BottomNavigationBarType.fixed,
+                    backgroundColor: Colors.white,
+                    selectedItemColor: Colors.deepOrange,
+                    unselectedItemColor: Colors.grey.shade400,
+                    selectedFontSize: 11,
+                    unselectedFontSize: 10,
+                    elevation: 0,
+                    selectedLabelStyle:
+                        GoogleFonts.tajawal(fontWeight: FontWeight.w700),
+                    unselectedLabelStyle:
+                        GoogleFonts.tajawal(fontWeight: FontWeight.w500),
+                    items: const [
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.home_rounded),
+                        activeIcon: Icon(Icons.home_rounded, size: 28),
+                        label: 'الرئيسية',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.store_rounded),
+                        activeIcon: Icon(Icons.store_rounded, size: 28),
+                        label: 'المتاجر',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.description_rounded),
+                        activeIcon: Icon(Icons.description_rounded, size: 28),
+                        label: 'البيانات',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.feedback_rounded),
+                        activeIcon: Icon(Icons.feedback_rounded, size: 28),
+                        label: 'الشكاوى',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.info_rounded),
+                        activeIcon: Icon(Icons.info_rounded, size: 28),
+                        label: 'عن البلدية',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.newspaper_rounded),
+                        activeIcon: Icon(Icons.newspaper_rounded, size: 28),
+                        label: 'آخر الأخبار',
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.store_rounded),
-                activeIcon: Icon(Icons.store_rounded, size: 28),
-                label: 'المتاجر',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.description_rounded),
-                activeIcon: Icon(Icons.description_rounded, size: 28),
-                label: 'البيانات',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.feedback_rounded),
-                activeIcon: Icon(Icons.feedback_rounded, size: 28),
-                label: 'الشكاوى',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.info_rounded),
-                activeIcon: Icon(Icons.info_rounded, size: 28),
-                label: 'عن البلدية',
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

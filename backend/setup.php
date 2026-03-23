@@ -105,6 +105,18 @@ try {
         `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB");
 
+    // News table
+    $pdo->exec("CREATE TABLE IF NOT EXISTS `news` (
+        `id` INT AUTO_INCREMENT PRIMARY KEY,
+        `title` VARCHAR(500) NOT NULL,
+        `content` TEXT NOT NULL,
+        `image_url` TEXT,
+        `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+        `published_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+        `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB");
+
     // About sections table
     $pdo->exec("CREATE TABLE IF NOT EXISTS `about_sections` (
         `id` INT AUTO_INCREMENT PRIMARY KEY,

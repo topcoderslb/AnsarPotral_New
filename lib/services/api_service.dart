@@ -125,13 +125,33 @@ class ApiService {
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         return data
-            .map((item) => (item['image_url'] ?? item['imageUrl'] ?? '') as String)
+            .map((item) =>
+                (item['image_url'] ?? item['imageUrl'] ?? '') as String)
             .where((url) => url.isNotEmpty)
             .toList();
       }
       return [];
     } catch (e) {
       print('Error fetching carousel images: $e');
+      return [];
+    }
+  }
+
+  // ============= NEWS =============
+
+  Future<List<Map<String, dynamic>>> getNews() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/news?active_only=1'),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        return data.map((item) => Map<String, dynamic>.from(item)).toList();
+      }
+      return [];
+    } catch (e) {
+      print('Error fetching news: $e');
       return [];
     }
   }

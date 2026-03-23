@@ -54,12 +54,16 @@ class _MunicipalityStatementsPageState
           List<String> imageUrls = [];
           final images = item['images'] ?? item['imageUrls'];
           if (images is List) {
-            imageUrls = images.map((img) {
-              if (img is Map) {
-                return (img['image_url'] ?? img['imageUrl'] ?? '') as String;
-              }
-              return img.toString();
-            }).where((url) => url.isNotEmpty).toList();
+            imageUrls = images
+                .map((img) {
+                  if (img is Map) {
+                    return (img['image_url'] ?? img['imageUrl'] ?? '')
+                        as String;
+                  }
+                  return img.toString();
+                })
+                .where((url) => url.isNotEmpty)
+                .toList();
           }
 
           return MunicipalityStatement(
@@ -119,53 +123,53 @@ class _MunicipalityStatementsPageState
                 children: [
                   // Image Carousel in popup
                   if (statement.imageUrls.isNotEmpty)
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.3,
-                    decoration: BoxDecoration(
-                      borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(20)),
-                    ),
-                    child: ClipRRect(
-                      borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(20)),
-                      child: CarouselSlider(
-                        options: CarouselOptions(
-                          height: MediaQuery.of(context).size.height * 0.3,
-                          viewportFraction: 1.0,
-                          autoPlay: true,
-                          autoPlayInterval: Duration(seconds: 4),
-                          autoPlayAnimationDuration:
-                              Duration(milliseconds: 1000),
-                          autoPlayCurve: Curves.easeInOutCubic,
-                          enlargeCenterPage: false,
-                          scrollDirection: Axis.horizontal,
-                        ),
-                        items: statement.imageUrls.map((imageUrl) {
-                          return CachedNetworkImage(
-                            imageUrl: imageUrl,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            placeholder: (context, url) => Container(
-                              color: Colors.grey.shade300,
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.deepOrange),
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.3,
+                      decoration: BoxDecoration(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(20)),
+                      ),
+                      child: ClipRRect(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(20)),
+                        child: CarouselSlider(
+                          options: CarouselOptions(
+                            height: MediaQuery.of(context).size.height * 0.3,
+                            viewportFraction: 1.0,
+                            autoPlay: true,
+                            autoPlayInterval: Duration(seconds: 4),
+                            autoPlayAnimationDuration:
+                                Duration(milliseconds: 1000),
+                            autoPlayCurve: Curves.easeInOutCubic,
+                            enlargeCenterPage: false,
+                            scrollDirection: Axis.horizontal,
+                          ),
+                          items: statement.imageUrls.map((imageUrl) {
+                            return CachedNetworkImage(
+                              imageUrl: imageUrl,
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              placeholder: (context, url) => Container(
+                                color: Colors.grey.shade300,
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.deepOrange),
+                                  ),
                                 ),
                               ),
-                            ),
-                            errorWidget: (context, url, error) => Container(
-                              color: Colors.grey.shade300,
-                              child: Icon(
-                                Icons.error,
-                                color: Colors.grey.shade600,
+                              errorWidget: (context, url, error) => Container(
+                                color: Colors.grey.shade300,
+                                child: Icon(
+                                  Icons.error,
+                                  color: Colors.grey.shade600,
+                                ),
                               ),
-                            ),
-                          );
-                        }).toList(),
+                            );
+                          }).toList(),
+                        ),
                       ),
                     ),
-                  ),
 
                   // Statement Info in popup
                   Padding(
@@ -183,7 +187,6 @@ class _MunicipalityStatementsPageState
                                 style: TextStyle(
                                   fontSize: 22,
                                   fontWeight: FontWeight.bold,
-                                  
                                   color: Colors.deepOrange.shade700,
                                 ),
                               ),
@@ -202,7 +205,6 @@ class _MunicipalityStatementsPageState
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.deepOrange.shade700,
-                                  
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -218,7 +220,6 @@ class _MunicipalityStatementsPageState
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.grey.shade600,
-                            
                             height: 1.2,
                             letterSpacing: 0.2,
                           ),
@@ -234,7 +235,6 @@ class _MunicipalityStatementsPageState
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey.shade600,
-                              
                               height: 1.5,
                               letterSpacing: 0.3,
                             ),
@@ -262,7 +262,6 @@ class _MunicipalityStatementsPageState
                               'إغلاق',
                               style: TextStyle(
                                 color: Colors.white,
-                                
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
@@ -285,7 +284,7 @@ class _MunicipalityStatementsPageState
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
-        appBar: ModernAppBar(title: 'بيانات البلدية'),
+        appBar: ModernAppBar(title: 'بيانات البلدية', showBackButton: false),
         body: Center(
           child: CircularProgressIndicator(
             valueColor: AlwaysStoppedAnimation<Color>(Colors.deepOrange),
@@ -300,7 +299,7 @@ class _MunicipalityStatementsPageState
             : statements.where((s) => s.category == selectedCategory).toList();
 
     return Scaffold(
-      appBar: ModernAppBar(title: 'بيانات البلدية'),
+      appBar: ModernAppBar(title: 'بيانات البلدية', showBackButton: false),
       body: Column(
         children: [
           // Category Filter
@@ -321,7 +320,8 @@ class _MunicipalityStatementsPageState
                     },
                     child: Container(
                       margin: EdgeInsets.only(right: 8),
-                      padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                       decoration: BoxDecoration(
                         color: isSelected ? Colors.deepOrange : Colors.white,
                         borderRadius: BorderRadius.circular(20),
@@ -343,7 +343,6 @@ class _MunicipalityStatementsPageState
                         category,
                         style: TextStyle(
                           color: isSelected ? Colors.white : Colors.deepOrange,
-                          
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
                           height: 1.2,
@@ -376,7 +375,6 @@ class _MunicipalityStatementsPageState
                           style: TextStyle(
                             fontSize: 18,
                             color: Colors.grey.shade600,
-                            
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -418,51 +416,51 @@ class _MunicipalityStatementsPageState
           children: [
             // Statement Image with Carousel
             if (statement.imageUrls.isNotEmpty)
-            Container(
-              height: MediaQuery.of(context).size.height * 0.22,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                child: CarouselSlider(
-                  options: CarouselOptions(
-                    height: MediaQuery.of(context).size.height * 0.22,
-                    viewportFraction: 1.0,
-                    autoPlay: true,
-                    autoPlayInterval: Duration(seconds: 3),
-                    autoPlayAnimationDuration: Duration(milliseconds: 800),
-                    autoPlayCurve: Curves.fastOutSlowIn,
-                    enlargeCenterPage: false,
-                    scrollDirection: Axis.horizontal,
+              Container(
+                height: MediaQuery.of(context).size.height * 0.22,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                  child: CarouselSlider(
+                    options: CarouselOptions(
+                      height: MediaQuery.of(context).size.height * 0.22,
+                      viewportFraction: 1.0,
+                      autoPlay: true,
+                      autoPlayInterval: Duration(seconds: 3),
+                      autoPlayAnimationDuration: Duration(milliseconds: 800),
+                      autoPlayCurve: Curves.fastOutSlowIn,
+                      enlargeCenterPage: false,
+                      scrollDirection: Axis.horizontal,
+                    ),
+                    items: statement.imageUrls.map((imageUrl) {
+                      return CachedNetworkImage(
+                        imageUrl: imageUrl,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        placeholder: (context, url) => Container(
+                          color: Colors.grey.shade300,
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.deepOrange),
+                            ),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          color: Colors.grey.shade300,
+                          child: Icon(
+                            Icons.image_not_supported,
+                            color: Colors.grey.shade600,
+                            size: 40,
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   ),
-                  items: statement.imageUrls.map((imageUrl) {
-                          return CachedNetworkImage(
-                            imageUrl: imageUrl,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            placeholder: (context, url) => Container(
-                              color: Colors.grey.shade300,
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.deepOrange),
-                                ),
-                              ),
-                            ),
-                            errorWidget: (context, url, error) => Container(
-                              color: Colors.grey.shade300,
-                              child: Icon(
-                                Icons.image_not_supported,
-                                color: Colors.grey.shade600,
-                                size: 40,
-                              ),
-                            ),
-                          );
-                        }).toList(),
                 ),
               ),
-            ),
 
             // Statement Info
             Padding(
@@ -481,7 +479,6 @@ class _MunicipalityStatementsPageState
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            
                             color: Colors.deepOrange.shade700,
                             height: 1.4,
                             letterSpacing: 0.2,
@@ -502,7 +499,6 @@ class _MunicipalityStatementsPageState
                           style: TextStyle(
                             fontSize: 10,
                             color: Colors.deepOrange.shade700,
-                            
                             fontWeight: FontWeight.bold,
                             height: 1.2,
                             letterSpacing: 0.2,
@@ -520,7 +516,6 @@ class _MunicipalityStatementsPageState
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey.shade600,
-                      
                     ),
                   ),
 
@@ -532,7 +527,6 @@ class _MunicipalityStatementsPageState
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey.shade600,
-                      
                       height: 1.3,
                     ),
                     maxLines: 3,
@@ -555,7 +549,6 @@ class _MunicipalityStatementsPageState
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.deepOrange.shade400,
-                          
                           fontWeight: FontWeight.w500,
                           height: 1.2,
                           letterSpacing: 0.2,

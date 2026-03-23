@@ -63,7 +63,7 @@ class _AboutMunicipalityPageState extends State<AboutMunicipalityPage> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
-        appBar: ModernAppBar(title: 'عن البلدية'),
+        appBar: ModernAppBar(title: 'عن البلدية', showBackButton: false),
         body: Center(
           child: CircularProgressIndicator(
             valueColor: AlwaysStoppedAnimation<Color>(Colors.deepOrange),
@@ -73,7 +73,7 @@ class _AboutMunicipalityPageState extends State<AboutMunicipalityPage> {
     }
 
     return Scaffold(
-      appBar: ModernAppBar(title: 'عن البلدية'),
+      appBar: ModernAppBar(title: 'عن البلدية', showBackButton: false),
       body: LayoutBuilder(
         builder: (context, constraints) {
           final screenWidth = constraints.maxWidth;
@@ -82,124 +82,125 @@ class _AboutMunicipalityPageState extends State<AboutMunicipalityPage> {
           final headerTitleSize = (screenWidth * 0.065).clamp(20.0, 28.0);
           final headerSubSize = (screenWidth * 0.04).clamp(13.0, 16.0);
           return SingleChildScrollView(
-        padding: EdgeInsets.all(screenWidth * 0.04),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header Section
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.deepOrange.shade50, Colors.orange.shade50],
+            padding: EdgeInsets.all(screenWidth * 0.04),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header Section
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.deepOrange.shade50,
+                        Colors.orange.shade50
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.deepOrange.shade200),
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: Colors.deepOrange.shade100,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.account_balance,
+                          size: headerIconSize,
+                          color: Colors.deepOrange.shade700,
+                        ),
+                      ),
+                      SizedBox(height: 12),
+                      Text(
+                        'بلدية أنصار',
+                        style: GoogleFonts.tajawal(
+                          fontSize: headerTitleSize,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.deepOrange.shade700,
+                        ),
+                      ),
+                      SizedBox(height: 6),
+                      Text(
+                        'المنصّة الرقميّة لبلدية أنصار',
+                        style: GoogleFonts.tajawal(
+                          fontSize: headerSubSize,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.deepOrange.shade200),
-              ),
-              child: Column(
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: Colors.deepOrange.shade100,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.account_balance,
-                      size: headerIconSize,
-                      color: Colors.deepOrange.shade700,
-                    ),
+
+                SizedBox(height: 24),
+
+                // Dynamic Sections from API
+                ..._sections.map((section) {
+                  final title = section['title'] ?? '';
+                  final icon = section['icon'] ?? '';
+                  final content = section['content'];
+                  List<String> contentList = [];
+
+                  if (content is List) {
+                    contentList = content.map((e) => e.toString()).toList();
+                  } else if (content is String) {
+                    contentList = [content];
+                  }
+
+                  return Column(
+                    children: [
+                      _buildSection(
+                        title: title,
+                        icon: _getIconForSection(icon),
+                        content: contentList,
+                      ),
+                      SizedBox(height: 24),
+                    ],
+                  );
+                }).toList(),
+
+                // Footer
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.grey.shade300),
                   ),
-                  SizedBox(height: 12),
-                  Text(
-                    'بلدية أنصار',
-                    style: GoogleFonts.tajawal(
-                      fontSize: headerTitleSize,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.deepOrange.shade700,
-                    ),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.favorite,
+                        color: Colors.deepOrange.shade400,
+                        size: 24,
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'بلدية أنصار',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.deepOrange.shade700,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'في خدمة المواطنين',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 6),
-                  Text(
-                    'المنصّة الرقميّة لبلدية أنصار',
-                    style: GoogleFonts.tajawal(
-                      fontSize: headerSubSize,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-
-            SizedBox(height: 24),
-
-            // Dynamic Sections from API
-            ..._sections.map((section) {
-              final title = section['title'] ?? '';
-              final icon = section['icon'] ?? '';
-              final content = section['content'];
-              List<String> contentList = [];
-              
-              if (content is List) {
-                contentList = content.map((e) => e.toString()).toList();
-              } else if (content is String) {
-                contentList = [content];
-              }
-
-              return Column(
-                children: [
-                  _buildSection(
-                    title: title,
-                    icon: _getIconForSection(icon),
-                    content: contentList,
-                  ),
-                  SizedBox(height: 24),
-                ],
-              );
-            }).toList(),
-
-            // Footer
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.shade300),
-              ),
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.favorite,
-                    color: Colors.deepOrange.shade400,
-                    size: 24,
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'بلدية أنصار',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      
-                      color: Colors.deepOrange.shade700,
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    'في خدمة المواطنين',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey.shade600,
-                      
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
+          );
         },
       ),
     );
@@ -248,7 +249,6 @@ class _AboutMunicipalityPageState extends State<AboutMunicipalityPage> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    
                     color: Colors.deepOrange.shade700,
                   ),
                 ),
@@ -259,36 +259,37 @@ class _AboutMunicipalityPageState extends State<AboutMunicipalityPage> {
           SizedBox(height: 16),
 
           // Section Content
-          ...content.map((text) => Padding(
-            padding: EdgeInsets.only(bottom: 12),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  margin: EdgeInsets.only(top: 6, right: 8),
-                  width: 6,
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: Colors.deepOrange.shade400,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                Expanded(
-                  child: Text(
-                    text,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey.shade700,
-                      
-                      height: 1.4,
+          ...content
+              .map((text) => Padding(
+                    padding: EdgeInsets.only(bottom: 12),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(top: 6, right: 8),
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: Colors.deepOrange.shade400,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            text,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey.shade700,
+                              height: 1.4,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ),
-              ],
-            ),
-          )).toList(),
+                  ))
+              .toList(),
         ],
       ),
     );
   }
-} 
+}
