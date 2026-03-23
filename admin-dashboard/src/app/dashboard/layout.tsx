@@ -1,23 +1,52 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Sidebar from '@/components/Sidebar';
+
+// Pages that require a specific permission key for sub_admins
+const PAGE_PERM_MAP: Record<string, string> = {
+    '/dashboard/stores': 'stores',
+    '/dashboard/store-categories': 'store-categories',
+    '/dashboard/statements': 'statements',
+    '/dashboard/landmarks': 'landmarks',
+    '/dashboard/news': 'news',
+    '/dashboard/about': 'about',
+    '/dashboard/complaints': 'complaints',
+    '/dashboard/carousel': 'carousel',
+    '/dashboard/settings': 'settings',
+    '/dashboard/users': '__adminOnly__',
+};
 
 export default function DashboardLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
-    const { user, loading } = useAuth();
+    const { user, loading, hasPermission } = useAuth();
     const router = useRouter();
+    const pathname = usePathname();
 
     useEffect(() => {
-        if (!loading && !user) {
+        if (loading) return;
+
+        if (!user) {
             router.replace('/login');
+            return;
         }
-    }, [user, loading, router]);
+
+        // Permission guard for sub_admin
+        if (user.role !== 'admin') {
+            const permKey = Object.entries(PAGE_PERM_MAP).find(
+                ([path]) => pathname === path || pathname.startsWith(path + '/')
+            )?.[1];
+
+            if (permKey === '__adminOnly__' || (permKey && !hasPermission(permKey))) {
+                router.replace('/dashboard');
+            }
+        }
+    }, [user, loading, pathname, router, hasPermission]);
 
     if (loading) {
         return (

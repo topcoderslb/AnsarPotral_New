@@ -8,11 +8,13 @@ interface AuthUser {
     email: string;
     name: string;
     role: string;
+    permissions?: Record<string, boolean> | null;
 }
 
 interface AuthContextType {
     user: AuthUser | null;
     loading: boolean;
+    hasPermission: (page: string) => boolean;
     signIn: (email: string, password: string) => Promise<void>;
     signOut: () => Promise<void>;
 }
@@ -82,11 +84,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         setToken(data.token);
-        const authUser = {
+        const authUser: AuthUser = {
             user_id: data.user.id,
             email: data.user.email,
             name: data.user.name,
             role: data.user.role,
+            permissions: data.user.permissions ?? null,
         };
         localStorage.setItem('auth_user', JSON.stringify(authUser));
         setUser(authUser);
@@ -98,8 +101,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
     };
 
+    // Admin sees everything; sub_admin checks the permissions map
+    const hasPermission = (page: string): boolean => {
+        if (!user) return false;
+        if (user.role === 'admin') return true;
+        return user.permissions?.[page] === true;
+    };
+
     return (
-        <AuthContext.Provider value={{ user, loading, signIn, signOut }}>
+        <AuthContext.Provider value={{ user, loading, hasPermission, signIn, signOut }}>
             {children}
         </AuthContext.Provider>
     );

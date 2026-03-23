@@ -34,25 +34,25 @@ class _LastNewsPageState extends State<LastNewsPage> {
     }
   }
 
-  /// Returns "23 / 03 / 2026"
-  String _formatDate(dynamic dateValue) {
-    if (dateValue == null || dateValue.toString().isEmpty) return '';
-    try {
-      final dt = DateTime.parse(dateValue.toString()).toLocal();
-      return '${dt.day.toString().padLeft(2, '0')} / '
-          '${dt.month.toString().padLeft(2, '0')} / '
-          '${dt.year}';
-    } catch (_) {
-      return '';
-    }
-  }
+  // Arabic month names — mirrors the dashboard ar-LB locale output
+  static const List<String> _arabicMonths = [
+    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
+  ];
 
-  /// Returns "14:30"
-  String _formatTime(dynamic dateValue) {
+  /// Returns e.g. "24 مارس 2026  •  02:30 م"
+  String _formatDateTime(dynamic dateValue) {
     if (dateValue == null || dateValue.toString().isEmpty) return '';
     try {
       final dt = DateTime.parse(dateValue.toString()).toLocal();
-      return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+      final month = _arabicMonths[dt.month - 1];
+      final hourRaw = dt.hour;
+      final hour12 =
+          hourRaw == 0 ? 12 : (hourRaw > 12 ? hourRaw - 12 : hourRaw);
+      final amPm = hourRaw >= 12 ? 'م' : 'ص';
+      final minute = dt.minute.toString().padLeft(2, '0');
+      return '${dt.day} $month ${dt.year}  •  '
+          '${hour12.toString().padLeft(2, '0')}:$minute $amPm';
     } catch (_) {
       return '';
     }
@@ -99,8 +99,7 @@ class _LastNewsPageState extends State<LastNewsPage> {
                       final raw = item['published_at'] ?? item['publishedAt'];
                       return _NewsCard(
                         item: item,
-                        dateText: _formatDate(raw),
-                        timeText: _formatTime(raw),
+                        dateTimeText: _formatDateTime(raw),
                       );
                     },
                   ),
@@ -111,13 +110,11 @@ class _LastNewsPageState extends State<LastNewsPage> {
 
 class _NewsCard extends StatelessWidget {
   final Map<String, dynamic> item;
-  final String dateText;
-  final String timeText;
+  final String dateTimeText;
 
   const _NewsCard({
     required this.item,
-    required this.dateText,
-    required this.timeText,
+    required this.dateTimeText,
   });
 
   @override
@@ -174,67 +171,35 @@ class _NewsCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  // Date + Time row
-                  if (dateText.isNotEmpty || timeText.isNotEmpty)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        // Time badge
-                        if (timeText.isNotEmpty)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 5),
-                            decoration: BoxDecoration(
-                              color: Colors.orange.withOpacity(0.12),
-                              borderRadius: BorderRadius.circular(20),
+                  // Combined date & time badge — Arabic format like the dashboard
+                  if (dateTimeText.isNotEmpty)
+                    Align(
+                      alignment: AlignmentDirectional.centerEnd,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.deepOrange.withOpacity(0.09),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.calendar_today_rounded,
+                                size: 14, color: Colors.deepOrange),
+                            const SizedBox(width: 6),
+                            Text(
+                              dateTimeText,
+                              textDirection: TextDirection.rtl,
+                              style: GoogleFonts.tajawal(
+                                fontSize: 13,
+                                color: Colors.deepOrange,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.access_time_rounded,
-                                    size: 13, color: Colors.deepOrange),
-                                const SizedBox(width: 4),
-                                Text(
-                                  timeText,
-                                  style: GoogleFonts.tajawal(
-                                    fontSize: 13,
-                                    color: Colors.deepOrange,
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        if (dateText.isNotEmpty && timeText.isNotEmpty)
-                          const SizedBox(width: 8),
-                        // Date badge
-                        if (dateText.isNotEmpty)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 5),
-                            decoration: BoxDecoration(
-                              color: Colors.deepOrange.withOpacity(0.08),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.calendar_today_rounded,
-                                    size: 13, color: Colors.deepOrange),
-                                const SizedBox(width: 4),
-                                Text(
-                                  dateText,
-                                  style: GoogleFonts.tajawal(
-                                    fontSize: 13,
-                                    color: Colors.deepOrange,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                      ],
+                          ],
+                        ),
+                      ),
                     ),
 
                   const SizedBox(height: 10),

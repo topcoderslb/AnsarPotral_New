@@ -12,11 +12,23 @@ export async function GET() {
       email VARCHAR(255) NOT NULL UNIQUE,
       password VARCHAR(255) NOT NULL,
       name VARCHAR(255) NOT NULL,
-      role ENUM('admin', 'user') NOT NULL DEFAULT 'user',
+      phone VARCHAR(50) DEFAULT NULL,
+      role ENUM('admin','sub_admin','user') NOT NULL DEFAULT 'user',
+      permissions TEXT DEFAULT NULL,
       is_active TINYINT(1) NOT NULL DEFAULT 1,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB`);
+
+    // Migrate existing users table to add new columns if they don't exist
+    const alterQueries = [
+      "ALTER TABLE users ADD COLUMN phone VARCHAR(50) DEFAULT NULL",
+      "ALTER TABLE users ADD COLUMN permissions TEXT DEFAULT NULL",
+      "ALTER TABLE users MODIFY COLUMN role ENUM('admin','sub_admin','user') NOT NULL DEFAULT 'user'",
+    ];
+    for (const q of alterQueries) {
+      await pool.query(q).catch(() => {}); // safe to ignore if column already exists
+    }
 
     await pool.query(`CREATE TABLE IF NOT EXISTS stores (
       id INT AUTO_INCREMENT PRIMARY KEY,

@@ -34,11 +34,17 @@ export async function POST(request: NextRequest) {
       return json({ error: 'Invalid email or password' }, 401);
     }
 
+    let permissions: Record<string, boolean> | null = null;
+    if (user.permissions) {
+      try { permissions = JSON.parse(user.permissions); } catch { /* keep null */ }
+    }
+
     const token = generateToken({
       user_id: user.id,
       email: user.email,
       role: user.role,
       name: user.name,
+      permissions,
     });
 
     return json({
@@ -49,6 +55,7 @@ export async function POST(request: NextRequest) {
         email: user.email,
         name: user.name,
         role: user.role,
+        permissions,
       },
     });
   }
