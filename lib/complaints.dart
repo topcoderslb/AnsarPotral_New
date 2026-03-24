@@ -6,7 +6,7 @@ import 'modern_app_bar.dart';
 import 'services/api_service.dart';
 
 class ComplaintsPage extends StatefulWidget {
-  const ComplaintsPage({Key? key}) : super(key: key);
+  const ComplaintsPage({super.key});
 
   @override
   _ComplaintsPageState createState() => _ComplaintsPageState();
@@ -72,7 +72,7 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                title: Row(
+                title: const Row(
                   children: [
                     Icon(Icons.check_circle, color: Colors.green, size: 28),
                     SizedBox(width: 8),
@@ -84,7 +84,7 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                     ),
                   ],
                 ),
-                content: Text(
+                content: const Text(
                   'تم إرسال شكواك إلى البلدية بنجاح. سنقوم بمراجعتها والرد عليك في أقرب وقت ممكن.',
                   style: TextStyle(),
                 ),
@@ -94,7 +94,7 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                       Navigator.of(context).pop();
                       _resetForm();
                     },
-                    child: Text(
+                    child: const Text(
                       'حسناً',
                       style: TextStyle(
                         color: Colors.deepOrange,
@@ -109,7 +109,8 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
         } else {
           // Show error
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('حدث خطأ في إرسال الشكوى. حاول مرة أخرى.')),
+            const SnackBar(
+                content: Text('حدث خطأ في إرسال الشكوى. حاول مرة أخرى.')),
           );
         }
       } catch (e) {
@@ -117,7 +118,7 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
           _isSubmitting = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('حدث خطأ غير متوقع. حاول مرة أخرى.')),
+          const SnackBar(content: Text('حدث خطأ غير متوقع. حاول مرة أخرى.')),
         );
       }
     }
@@ -136,9 +137,9 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ModernAppBar(title: 'تقديم الشكاوى', showBackButton: false),
+      appBar: const ModernAppBar(title: 'تقديم الشكاوى', showBackButton: false),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
           child: Column(
@@ -146,7 +147,7 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
             children: [
               // Header
               Container(
-                padding: EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [Colors.deepOrange.shade50, Colors.orange.shade50],
@@ -161,7 +162,7 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                       size: 48,
                       color: Colors.deepOrange.shade700,
                     ),
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     Text(
                       'تقديم شكوى للبلدية',
                       style: GoogleFonts.tajawal(
@@ -170,7 +171,7 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                         color: Colors.deepOrange.shade700,
                       ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
                       'نحن هنا لمساعدتك. يرجى ملء النموذج أدناه لتقديم شكواك.',
                       textAlign: TextAlign.center,
@@ -183,7 +184,7 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                 ),
               ),
 
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
 
               // Full Name Field
               TextFormField(
@@ -191,13 +192,15 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                 decoration: InputDecoration(
                   labelText: 'الاسم الكامل',
                   hintText: 'أدخل اسمك الكامل',
-                  prefixIcon: Icon(Icons.person, color: Colors.deepOrange),
+                  prefixIcon:
+                      const Icon(Icons.person, color: Colors.deepOrange),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.deepOrange, width: 2),
+                    borderSide:
+                        const BorderSide(color: Colors.deepOrange, width: 2),
                   ),
                   filled: true,
                   fillColor: Colors.grey.shade50,
@@ -210,7 +213,7 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                 },
               ),
 
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               // Phone Number Field
               TextFormField(
@@ -219,13 +222,14 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                 decoration: InputDecoration(
                   labelText: 'رقم الهاتف',
                   hintText: 'أدخل رقم هاتفك',
-                  prefixIcon: Icon(Icons.phone, color: Colors.deepOrange),
+                  prefixIcon: const Icon(Icons.phone, color: Colors.deepOrange),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.deepOrange, width: 2),
+                    borderSide:
+                        const BorderSide(color: Colors.deepOrange, width: 2),
                   ),
                   filled: true,
                   fillColor: Colors.grey.shade50,
@@ -238,7 +242,7 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                 },
               ),
 
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               // Complaint Text Field
               TextFormField(
@@ -247,7 +251,7 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                 decoration: InputDecoration(
                   labelText: 'نص الشكوى',
                   hintText: 'اكتب تفاصيل شكواك هنا...',
-                  prefixIcon: Padding(
+                  prefixIcon: const Padding(
                     padding: EdgeInsets.only(bottom: 0),
                     child: Align(
                       alignment: Alignment.topCenter,
@@ -261,7 +265,8 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.deepOrange, width: 2),
+                    borderSide:
+                        const BorderSide(color: Colors.deepOrange, width: 2),
                   ),
                   filled: true,
                   fillColor: Colors.grey.shade50,
@@ -277,11 +282,11 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                 },
               ),
 
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               // Image Upload Section
               Container(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade50,
                   borderRadius: BorderRadius.circular(12),
@@ -298,12 +303,13 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                         color: Colors.deepOrange.shade700,
                       ),
                     ),
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     if (_selectedImage == null)
                       ElevatedButton.icon(
                         onPressed: _pickImage,
-                        icon: Icon(Icons.photo_camera, color: Colors.white),
-                        label: Text(
+                        icon:
+                            const Icon(Icons.photo_camera, color: Colors.white),
+                        label: const Text(
                           'اختيار صورة',
                           style: TextStyle(
                             color: Colors.white,
@@ -315,7 +321,7 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          padding: EdgeInsets.symmetric(vertical: 12),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
                       )
                     else
@@ -339,22 +345,21 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                                       _selectedImage!.path,
                                       fit: BoxFit.cover,
                                       errorBuilder:
-                                          (context, error, stackTrace) => Icon(
-                                              Icons.image,
-                                              size: 50,
-                                              color: Colors.grey),
+                                          (context, error, stackTrace) =>
+                                              const Icon(Icons.image,
+                                                  size: 50, color: Colors.grey),
                                     ),
                             ),
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           Row(
                             children: [
                               Expanded(
                                 child: ElevatedButton.icon(
                                   onPressed: _pickImage,
-                                  icon: Icon(Icons.edit,
+                                  icon: const Icon(Icons.edit,
                                       color: Colors.white, size: 16),
-                                  label: Text(
+                                  label: const Text(
                                     'تغيير الصورة',
                                     style: TextStyle(
                                       color: Colors.white,
@@ -366,17 +371,18 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    padding: EdgeInsets.symmetric(vertical: 8),
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 8),
                                   ),
                                 ),
                               ),
-                              SizedBox(width: 8),
+                              const SizedBox(width: 8),
                               Expanded(
                                 child: ElevatedButton.icon(
                                   onPressed: _removeImage,
-                                  icon: Icon(Icons.delete,
+                                  icon: const Icon(Icons.delete,
                                       color: Colors.white, size: 16),
-                                  label: Text(
+                                  label: const Text(
                                     'حذف الصورة',
                                     style: TextStyle(
                                       color: Colors.white,
@@ -388,7 +394,8 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    padding: EdgeInsets.symmetric(vertical: 8),
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 8),
                                   ),
                                 ),
                               ),
@@ -400,7 +407,7 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                 ),
               ),
 
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
 
               // Submit Button
               ElevatedButton(
@@ -410,10 +417,10 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  padding: EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 child: _isSubmitting
-                    ? Row(
+                    ? const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           SizedBox(
@@ -436,7 +443,7 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                           ),
                         ],
                       )
-                    : Text(
+                    : const Text(
                         'إرسال الشكوى',
                         style: TextStyle(
                           color: Colors.white,
@@ -446,7 +453,7 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                       ),
               ),
 
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               // Reset Button
               OutlinedButton(
@@ -455,10 +462,10 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  side: BorderSide(color: Colors.deepOrange),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  side: const BorderSide(color: Colors.deepOrange),
                 ),
-                child: Text(
+                child: const Text(
                   'إعادة تعيين النموذج',
                   style: TextStyle(
                     color: Colors.deepOrange,

@@ -10,12 +10,11 @@ const menuItems = [
     { href: '/dashboard', icon: '🏠', label: 'الرئيسية' },
     { href: '/dashboard/stores', icon: '🏬', label: 'المتاجر', permKey: 'stores' },
     { href: '/dashboard/store-categories', icon: '🏷️', label: 'أصناف المتاجر', permKey: 'store-categories' },
-    { href: '/dashboard/statements', icon: '📋', label: 'بيانات البلدية', permKey: 'statements' },
+    { href: '/dashboard/statements', icon: '📋', label: 'بلدية أنصار', permKey: 'statements' },
     { href: '/dashboard/landmarks', icon: '🏛️', label: 'المعالم', permKey: 'landmarks' },
     { href: '/dashboard/news', icon: '📰', label: 'آخر الأخبار', permKey: 'news' },
     { href: '/dashboard/about', icon: '📖', label: 'عن البلدية', permKey: 'about' },
     { href: '/dashboard/complaints', icon: '📨', label: 'الشكاوى', permKey: 'complaints' },
-    { href: '/dashboard/carousel', icon: '🖼️', label: 'الصور الدوارة', permKey: 'carousel' },
     { href: '/dashboard/settings', icon: '⚙️', label: 'الإعدادات', permKey: 'settings' },
     { href: '/dashboard/users', icon: '👥', label: 'المستخدمون', adminOnly: true },
 ];
@@ -31,9 +30,9 @@ export default function Sidebar() {
     });
 
     return (
-        <aside className="w-64 bg-gradient-to-b from-orange-600 to-orange-700 text-white min-h-screen fixed right-0 top-0 shadow-xl flex flex-col">
+        <aside className="w-64 bg-gradient-to-b from-orange-600 to-orange-700 text-white h-screen fixed right-0 top-0 shadow-xl flex flex-col overflow-hidden">
             {/* Logo Section */}
-            <div className="p-6 border-b border-orange-500">
+            <div className="flex-shrink-0 p-6 border-b border-orange-500">
                 <h1 className="text-2xl font-bold text-center">لوحة التحكم</h1>
                 <p className="text-orange-200 text-sm text-center mt-1">Ansar Portal</p>
                 {user && (
@@ -41,8 +40,11 @@ export default function Sidebar() {
                 )}
             </div>
 
-            {/* Navigation */}
-            <nav className="mt-4 flex-1 overflow-y-auto">
+            {/* Navigation — scrollable */}
+            <nav
+                className="mt-2 flex-1 overflow-y-auto"
+                style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.25) transparent' }}
+            >
                 {visibleItems.map((item) => {
                     const isActive = pathname === item.href ||
                         (item.href !== '/dashboard' && pathname.startsWith(item.href));
@@ -63,8 +65,8 @@ export default function Sidebar() {
                 })}
             </nav>
 
-            {/* Sign Out Button */}
-            <div className="p-6 border-t border-orange-500">
+            {/* Sign Out Button — always visible at bottom */}
+            <div className="flex-shrink-0 p-4 border-t border-orange-500">
                 <button
                     onClick={() => signOut()}
                     className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-orange-800 hover:bg-orange-900 rounded-lg transition-colors"

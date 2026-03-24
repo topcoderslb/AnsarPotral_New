@@ -10,9 +10,9 @@ export async function OPTIONS() { return corsOptions(); }
 export async function POST(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const action = searchParams.get('action') || 'login';
-  const body = await request.json();
 
   if (action === 'login') {
+    const body = await request.json();
     const email = (body.email || '').trim();
     const password = body.password || '';
 

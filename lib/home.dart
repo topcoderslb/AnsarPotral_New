@@ -15,7 +15,7 @@ import 'last_news.dart';
 class HomePage extends StatefulWidget {
   final void Function(int)? onNavigateToTab;
 
-  const HomePage({Key? key, this.onNavigateToTab}) : super(key: key);
+  const HomePage({super.key, this.onNavigateToTab});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -247,17 +247,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               SizedBox(width: colSpacing),
               Expanded(
                 child: _buildFloatingButton(
-                  icon: Icons.description_rounded,
-                  label: 'بيانات البلدية',
+                  icon: Icons.newspaper_rounded,
+                  label: 'آخر الأخبار',
                   onTap: () {
                     if (widget.onNavigateToTab != null) {
-                      widget.onNavigateToTab!(2);
+                      widget.onNavigateToTab!(5);
                     } else {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  const MunicipalityStatementsPage()));
+                              builder: (context) => const LastNewsPage()));
                     }
                   },
                   delay: 100,
@@ -267,19 +266,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               SizedBox(width: colSpacing),
               Expanded(
                 child: _buildFloatingButton(
-                  icon: Icons.feedback_rounded,
-                  label: 'تقديم الشكاوى',
-                  onTap: () {
-                    if (widget.onNavigateToTab != null) {
-                      widget.onNavigateToTab!(3);
-                    } else {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const ComplaintsPage()));
-                    }
-                  },
+                  icon: FontAwesomeIcons.buildingColumns,
+                  label: 'أنصار',
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => TourismPage()),
+                  ),
                   delay: 200,
+                  isFontAwesome: true,
                   screenSize: screenSize,
                 ),
               ),
@@ -298,14 +292,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         colSpacing * 2) /
                     3,
                 child: _buildFloatingButton(
-                  icon: FontAwesomeIcons.buildingColumns,
-                  label: 'أنصار',
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => TourismPage()),
-                  ),
+                  icon: Icons.feedback_rounded,
+                  label: 'تقديم الشكاوى',
+                  onTap: () {
+                    if (widget.onNavigateToTab != null) {
+                      widget.onNavigateToTab!(3);
+                    } else {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const ComplaintsPage()));
+                    }
+                  },
                   delay: 300,
-                  isFontAwesome: true,
                   screenSize: screenSize,
                 ),
               ),
@@ -316,16 +315,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         colSpacing * 2) /
                     3,
                 child: _buildFloatingButton(
-                  icon: Icons.newspaper_rounded,
-                  label: 'آخر الأخبار',
+                  icon: Icons.description_rounded,
+                  label: 'بلدية أنصار',
                   onTap: () {
                     if (widget.onNavigateToTab != null) {
-                      widget.onNavigateToTab!(5);
+                      widget.onNavigateToTab!(2);
                     } else {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const LastNewsPage()));
+                              builder: (context) =>
+                                  const MunicipalityStatementsPage()));
                     }
                   },
                   delay: 400,
@@ -641,7 +641,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
+                    const Text(
                       'ANSAR',
                       style: TextStyle(
                         fontSize: 24,
@@ -651,11 +651,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    Flexible(
+                    const Flexible(
                       child: SingleChildScrollView(
                         child: Text(
                           "أهلاً بكم في بوابة أنصار، تطبيقكم الأمثل لاكتشاف كل ما هو جديد ومميز في أنصار ! نقدم لكم منصة شاملة تعرض أحدث الأخبار، العروض الحصرية، ومعلومات عن جميع المتاجر المحلية. تم تصميم بوابة أنصار لتجعل حياتكم أسهل، حيث يمكنكم العثور على كل ما تحتاجونه بلمسة زر. نهدف إلى تعزيز التجارة المحلية ودعم الاقتصاد في أنصار من خلال تسهيل الوصول إلى المعلومات والعروض التي تهمكم. انضموا إلينا الآن وكونوا جزءًا من مجتمع أنصار!",
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             height: 1.5,
                           ),
@@ -746,7 +746,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
+                    const Text(
                       'TopCoders\n Software Company',
                       textAlign: TextAlign.center,
                       style: TextStyle(

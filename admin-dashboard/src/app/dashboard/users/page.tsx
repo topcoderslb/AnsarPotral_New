@@ -7,12 +7,11 @@ import { apiFetch } from '@/lib/api';
 const PAGE_PERMISSIONS = [
   { key: 'stores', label: 'المتاجر', icon: '🏬' },
   { key: 'store-categories', label: 'أصناف المتاجر', icon: '🏷️' },
-  { key: 'statements', label: 'بيانات البلدية', icon: '📋' },
+  { key: 'statements', label: 'بلدية أنصار', icon: '📋' },
   { key: 'landmarks', label: 'المعالم', icon: '🏛️' },
   { key: 'news', label: 'آخر الأخبار', icon: '📰' },
   { key: 'about', label: 'عن البلدية', icon: '📖' },
   { key: 'complaints', label: 'الشكاوى', icon: '📨' },
-  { key: 'carousel', label: 'الصور الدوارة', icon: '🖼️' },
   { key: 'settings', label: 'الإعدادات', icon: '⚙️' },
 ];
 

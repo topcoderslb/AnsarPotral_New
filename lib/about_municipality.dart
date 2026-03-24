@@ -4,7 +4,7 @@ import 'modern_app_bar.dart';
 import 'services/api_service.dart';
 
 class AboutMunicipalityPage extends StatefulWidget {
-  const AboutMunicipalityPage({Key? key}) : super(key: key);
+  const AboutMunicipalityPage({super.key});
 
   @override
   State<AboutMunicipalityPage> createState() => _AboutMunicipalityPageState();
@@ -62,7 +62,7 @@ class _AboutMunicipalityPageState extends State<AboutMunicipalityPage> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Scaffold(
+      return const Scaffold(
         appBar: ModernAppBar(title: 'عن البلدية', showBackButton: false),
         body: Center(
           child: CircularProgressIndicator(
@@ -73,7 +73,7 @@ class _AboutMunicipalityPageState extends State<AboutMunicipalityPage> {
     }
 
     return Scaffold(
-      appBar: ModernAppBar(title: 'عن البلدية', showBackButton: false),
+      appBar: const ModernAppBar(title: 'عن البلدية', showBackButton: false),
       body: LayoutBuilder(
         builder: (context, constraints) {
           final screenWidth = constraints.maxWidth;
@@ -89,7 +89,7 @@ class _AboutMunicipalityPageState extends State<AboutMunicipalityPage> {
                 // Header Section
                 Container(
                   width: double.infinity,
-                  padding: EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
@@ -103,7 +103,7 @@ class _AboutMunicipalityPageState extends State<AboutMunicipalityPage> {
                   child: Column(
                     children: [
                       Container(
-                        padding: EdgeInsets.all(14),
+                        padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
                           color: Colors.deepOrange.shade100,
                           shape: BoxShape.circle,
@@ -114,7 +114,7 @@ class _AboutMunicipalityPageState extends State<AboutMunicipalityPage> {
                           color: Colors.deepOrange.shade700,
                         ),
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       Text(
                         'بلدية أنصار',
                         style: GoogleFonts.tajawal(
@@ -123,7 +123,7 @@ class _AboutMunicipalityPageState extends State<AboutMunicipalityPage> {
                           color: Colors.deepOrange.shade700,
                         ),
                       ),
-                      SizedBox(height: 6),
+                      const SizedBox(height: 6),
                       Text(
                         'المنصّة الرقميّة لبلدية أنصار',
                         style: GoogleFonts.tajawal(
@@ -135,7 +135,7 @@ class _AboutMunicipalityPageState extends State<AboutMunicipalityPage> {
                   ),
                 ),
 
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
 
                 // Dynamic Sections from API
                 ..._sections.map((section) {
@@ -157,15 +157,15 @@ class _AboutMunicipalityPageState extends State<AboutMunicipalityPage> {
                         icon: _getIconForSection(icon),
                         content: contentList,
                       ),
-                      SizedBox(height: 24),
+                      const SizedBox(height: 24),
                     ],
                   );
-                }).toList(),
+                }),
 
                 // Footer
                 Container(
                   width: double.infinity,
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: Colors.grey.shade50,
                     borderRadius: BorderRadius.circular(16),
@@ -178,7 +178,7 @@ class _AboutMunicipalityPageState extends State<AboutMunicipalityPage> {
                         color: Colors.deepOrange.shade400,
                         size: 24,
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
                         'بلدية أنصار',
                         style: TextStyle(
@@ -187,7 +187,7 @@ class _AboutMunicipalityPageState extends State<AboutMunicipalityPage> {
                           color: Colors.deepOrange.shade700,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         'في خدمة المواطنين',
                         style: TextStyle(
@@ -212,7 +212,7 @@ class _AboutMunicipalityPageState extends State<AboutMunicipalityPage> {
     required List<String> content,
   }) {
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -220,7 +220,7 @@ class _AboutMunicipalityPageState extends State<AboutMunicipalityPage> {
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
             blurRadius: 10,
-            offset: Offset(0, 5),
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -231,7 +231,7 @@ class _AboutMunicipalityPageState extends State<AboutMunicipalityPage> {
           Row(
             children: [
               Container(
-                padding: EdgeInsets.all(12),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Colors.deepOrange.shade50,
                   borderRadius: BorderRadius.circular(12),
@@ -242,7 +242,7 @@ class _AboutMunicipalityPageState extends State<AboutMunicipalityPage> {
                   size: 24,
                 ),
               ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   title,
@@ -256,38 +256,36 @@ class _AboutMunicipalityPageState extends State<AboutMunicipalityPage> {
             ],
           ),
 
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
 
           // Section Content
-          ...content
-              .map((text) => Padding(
-                    padding: EdgeInsets.only(bottom: 12),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          margin: EdgeInsets.only(top: 6, right: 8),
-                          width: 6,
-                          height: 6,
-                          decoration: BoxDecoration(
-                            color: Colors.deepOrange.shade400,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        Expanded(
-                          child: Text(
-                            text,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey.shade700,
-                              height: 1.4,
-                            ),
-                          ),
-                        ),
-                      ],
+          ...content.map((text) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(top: 6, right: 8),
+                      width: 6,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: Colors.deepOrange.shade400,
+                        shape: BoxShape.circle,
+                      ),
                     ),
-                  ))
-              .toList(),
+                    Expanded(
+                      child: Text(
+                        text,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade700,
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )),
         ],
       ),
     );

@@ -32,7 +32,7 @@ class Shop {
 }
 
 class StoresPage extends StatefulWidget {
-  const StoresPage({Key? key}) : super(key: key);
+  const StoresPage({super.key});
 
   @override
   _StoresPageState createState() => _StoresPageState();
@@ -114,7 +114,7 @@ class _StoresPageState extends State<StoresPage> {
       await launchUrl(phoneUri);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('لا يمكن الاتصال بالرقم')),
+        const SnackBar(content: Text('لا يمكن الاتصال بالرقم')),
       );
     }
   }
@@ -125,7 +125,7 @@ class _StoresPageState extends State<StoresPage> {
       await launchUrl(whatsappUri);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('لا يمكن فتح واتساب')),
+        const SnackBar(content: Text('لا يمكن فتح واتساب')),
       );
     }
   }
@@ -155,7 +155,7 @@ class _StoresPageState extends State<StoresPage> {
                 BoxShadow(
                   color: Colors.black.withOpacity(0.3),
                   blurRadius: 20,
-                  offset: Offset(0, 10),
+                  offset: const Offset(0, 10),
                 ),
               ],
             ),
@@ -167,20 +167,20 @@ class _StoresPageState extends State<StoresPage> {
                   if (shop.imageUrl.isNotEmpty)
                     Container(
                       height: screenHeight * 0.25,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         borderRadius:
                             BorderRadius.vertical(top: Radius.circular(20)),
                       ),
                       child: ClipRRect(
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(20)),
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(20)),
                         child: CachedNetworkImage(
                           imageUrl: shop.imageUrl,
                           fit: BoxFit.cover,
                           width: double.infinity,
                           placeholder: (context, url) => Container(
                             color: Colors.grey.shade300,
-                            child: Center(
+                            child: const Center(
                               child: CircularProgressIndicator(
                                 valueColor: AlwaysStoppedAnimation<Color>(
                                     Colors.deepOrange),
@@ -200,7 +200,7 @@ class _StoresPageState extends State<StoresPage> {
 
                   // Shop Info
                   Padding(
-                    padding: EdgeInsets.all(16), // Reduced padding
+                    padding: const EdgeInsets.all(16), // Reduced padding
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -220,7 +220,7 @@ class _StoresPageState extends State<StoresPage> {
                               ),
                             ),
                             Container(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
                                 color: Colors.deepOrange.shade50,
@@ -240,17 +240,17 @@ class _StoresPageState extends State<StoresPage> {
                           ],
                         ),
 
-                        SizedBox(height: 8), // Reduced spacing
+                        const SizedBox(height: 8), // Reduced spacing
 
                         // Location
                         if (shop.location.isNotEmpty)
                           Padding(
-                            padding: EdgeInsets.only(bottom: 8),
+                            padding: const EdgeInsets.only(bottom: 8),
                             child: Row(
                               children: [
-                                Icon(Icons.location_on,
+                                const Icon(Icons.location_on,
                                     size: 18, color: Colors.deepOrange),
-                                SizedBox(width: 6),
+                                const SizedBox(width: 6),
                                 Expanded(
                                   child: Text(
                                     shop.location,
@@ -276,7 +276,7 @@ class _StoresPageState extends State<StoresPage> {
                           textAlign: TextAlign.justify,
                         ),
 
-                        SizedBox(height: 16), // Reduced spacing
+                        const SizedBox(height: 16), // Reduced spacing
 
                         // Contact Buttons
                         Row(
@@ -288,9 +288,9 @@ class _StoresPageState extends State<StoresPage> {
                                   Navigator.of(context).pop();
                                   _makePhoneCall(shop.phoneNumber);
                                 },
-                                icon: Icon(Icons.phone,
+                                icon: const Icon(Icons.phone,
                                     color: Colors.white, size: 18),
-                                label: Text(
+                                label: const Text(
                                   'اتصال',
                                   style: TextStyle(
                                     color: Colors.white,
@@ -303,12 +303,13 @@ class _StoresPageState extends State<StoresPage> {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
-                                  padding: EdgeInsets.symmetric(vertical: 12),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
                                 ),
                               ),
                             ),
 
-                            SizedBox(width: 10),
+                            const SizedBox(width: 10),
 
                             // WhatsApp Button
                             Expanded(
@@ -317,9 +318,9 @@ class _StoresPageState extends State<StoresPage> {
                                   Navigator.of(context).pop();
                                   _openWhatsApp(shop.whatsappNumber);
                                 },
-                                icon: Icon(Icons.message,
+                                icon: const Icon(Icons.message,
                                     color: Colors.white, size: 18),
-                                label: Text(
+                                label: const Text(
                                   'واتساب',
                                   style: TextStyle(
                                     color: Colors.white,
@@ -328,18 +329,19 @@ class _StoresPageState extends State<StoresPage> {
                                   ),
                                 ),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Color(0xFF25D366),
+                                  backgroundColor: const Color(0xFF25D366),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
-                                  padding: EdgeInsets.symmetric(vertical: 12),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
                                 ),
                               ),
                             ),
                           ],
                         ),
 
-                        SizedBox(height: 12), // Reduced spacing
+                        const SizedBox(height: 12), // Reduced spacing
 
                         // Close Button
                         SizedBox(
@@ -351,7 +353,7 @@ class _StoresPageState extends State<StoresPage> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              padding: EdgeInsets.symmetric(vertical: 10),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
                             ),
                             child: Text(
                               'إغلاق',
@@ -378,10 +380,10 @@ class _StoresPageState extends State<StoresPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ModernAppBar(title: 'قسم المتاجر', showBackButton: false),
+      appBar: const ModernAppBar(title: 'قسم المتاجر', showBackButton: false),
       body: Column(
         children: [
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
 
           // Search Bar
           Padding(
@@ -391,10 +393,10 @@ class _StoresPageState extends State<StoresPage> {
               onChanged: (value) => _filterShops(),
               decoration: InputDecoration(
                 hintText: 'البحث في المتاجر...',
-                hintStyle: TextStyle(),
-                prefixIcon: Icon(Icons.search, color: Colors.deepOrange),
+                hintStyle: const TextStyle(),
+                prefixIcon: const Icon(Icons.search, color: Colors.deepOrange),
                 suffixIcon: IconButton(
-                  icon: Icon(Icons.clear),
+                  icon: const Icon(Icons.clear),
                   onPressed: () {
                     _searchController.clear();
                     _filterShops();
@@ -405,7 +407,8 @@ class _StoresPageState extends State<StoresPage> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.deepOrange, width: 2),
+                  borderSide:
+                      const BorderSide(color: Colors.deepOrange, width: 2),
                 ),
                 filled: true,
                 fillColor: Colors.grey.shade50,
@@ -414,11 +417,11 @@ class _StoresPageState extends State<StoresPage> {
           ),
 
           // Category Filter - Horizontally scrollable
-          Container(
+          SizedBox(
             height: 60,
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: categories.map((category) {
                   final isSelected = selectedCategory == category;
@@ -431,9 +434,9 @@ class _StoresPageState extends State<StoresPage> {
                       });
                     },
                     child: Container(
-                      margin: EdgeInsets.only(right: 12),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      margin: const EdgeInsets.only(right: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
                       decoration: BoxDecoration(
                         color: isSelected ? Colors.deepOrange : Colors.white,
                         borderRadius: BorderRadius.circular(30),
@@ -447,7 +450,7 @@ class _StoresPageState extends State<StoresPage> {
                           BoxShadow(
                             color: Colors.black.withOpacity(0.1),
                             blurRadius: 6,
-                            offset: Offset(0, 3),
+                            offset: const Offset(0, 3),
                           ),
                         ],
                       ),
@@ -469,7 +472,7 @@ class _StoresPageState extends State<StoresPage> {
             ),
           ),
 
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
 
           // Shops List
           Expanded(
@@ -483,7 +486,7 @@ class _StoresPageState extends State<StoresPage> {
                           size: 64,
                           color: Colors.grey.shade400,
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         Text(
                           'لا توجد متاجر',
                           style: TextStyle(
@@ -495,7 +498,7 @@ class _StoresPageState extends State<StoresPage> {
                     ),
                   )
                 : ListView.builder(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     itemCount: filteredShops.length,
                     itemBuilder: (context, index) {
                       final shop = filteredShops[index];
@@ -510,7 +513,7 @@ class _StoresPageState extends State<StoresPage> {
 
   Widget _buildShopCard(Shop shop) {
     return Container(
-      margin: EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -518,7 +521,7 @@ class _StoresPageState extends State<StoresPage> {
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
             blurRadius: 10,
-            offset: Offset(0, 5),
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -530,11 +533,12 @@ class _StoresPageState extends State<StoresPage> {
             onTap: () => _showShopPopup(context, shop),
             child: Container(
               height: MediaQuery.of(context).size.height * 0.22,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(16)),
                 child: Stack(
                   children: [
                     shop.imageUrl.isNotEmpty
@@ -545,7 +549,7 @@ class _StoresPageState extends State<StoresPage> {
                             height: double.infinity,
                             placeholder: (context, url) => Container(
                               color: Colors.grey.shade300,
-                              child: Center(
+                              child: const Center(
                                 child: CircularProgressIndicator(
                                   valueColor: AlwaysStoppedAnimation<Color>(
                                       Colors.deepOrange),
@@ -573,12 +577,12 @@ class _StoresPageState extends State<StoresPage> {
                       top: 8,
                       right: 8,
                       child: Container(
-                        padding: EdgeInsets.all(6),
+                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: Colors.black.withOpacity(0.6),
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: Icon(
+                        child: const Icon(
                           Icons.zoom_in,
                           color: Colors.white,
                           size: 16,
@@ -593,7 +597,7 @@ class _StoresPageState extends State<StoresPage> {
 
           // Shop Info
           Padding(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -612,8 +616,8 @@ class _StoresPageState extends State<StoresPage> {
                       ),
                     ),
                     Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: Colors.deepOrange.shade50,
                         borderRadius: BorderRadius.circular(20),
@@ -631,17 +635,17 @@ class _StoresPageState extends State<StoresPage> {
                   ],
                 ),
 
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
 
                 // Location
                 if (shop.location.isNotEmpty)
                   Padding(
-                    padding: EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.only(bottom: 8),
                     child: Row(
                       children: [
-                        Icon(Icons.location_on,
+                        const Icon(Icons.location_on,
                             size: 16, color: Colors.deepOrange),
-                        SizedBox(width: 4),
+                        const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             shop.location,
@@ -668,7 +672,7 @@ class _StoresPageState extends State<StoresPage> {
                   overflow: TextOverflow.ellipsis,
                 ),
 
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
 
                 // Contact Buttons
                 Row(
@@ -677,8 +681,9 @@ class _StoresPageState extends State<StoresPage> {
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: () => _makePhoneCall(shop.phoneNumber),
-                        icon: Icon(Icons.phone, color: Colors.white, size: 18),
-                        label: Text(
+                        icon: const Icon(Icons.phone,
+                            color: Colors.white, size: 18),
+                        label: const Text(
                           'اتصال',
                           style: TextStyle(
                             color: Colors.white,
@@ -690,20 +695,20 @@ class _StoresPageState extends State<StoresPage> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          padding: EdgeInsets.symmetric(vertical: 12),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
                       ),
                     ),
 
-                    SizedBox(width: 12),
+                    const SizedBox(width: 12),
 
                     // WhatsApp Button
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: () => _openWhatsApp(shop.whatsappNumber),
-                        icon:
-                            Icon(Icons.message, color: Colors.white, size: 18),
-                        label: Text(
+                        icon: const Icon(Icons.message,
+                            color: Colors.white, size: 18),
+                        label: const Text(
                           'واتساب',
                           style: TextStyle(
                             color: Colors.white,
@@ -711,11 +716,11 @@ class _StoresPageState extends State<StoresPage> {
                           ),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF25D366),
+                          backgroundColor: const Color(0xFF25D366),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          padding: EdgeInsets.symmetric(vertical: 12),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
                       ),
                     ),

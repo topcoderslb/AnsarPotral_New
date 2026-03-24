@@ -14,7 +14,6 @@ const PAGE_PERM_MAP: Record<string, string> = {
     '/dashboard/news': 'news',
     '/dashboard/about': 'about',
     '/dashboard/complaints': 'complaints',
-    '/dashboard/carousel': 'carousel',
     '/dashboard/settings': 'settings',
     '/dashboard/users': '__adminOnly__',
 };

@@ -24,7 +24,7 @@ class MunicipalityStatement {
 }
 
 class MunicipalityStatementsPage extends StatefulWidget {
-  const MunicipalityStatementsPage({Key? key}) : super(key: key);
+  const MunicipalityStatementsPage({super.key});
 
   @override
   _MunicipalityStatementsPageState createState() =>
@@ -113,7 +113,7 @@ class _MunicipalityStatementsPageState
                 BoxShadow(
                   color: Colors.black.withOpacity(0.3),
                   blurRadius: 20,
-                  offset: Offset(0, 10),
+                  offset: const Offset(0, 10),
                 ),
               ],
             ),
@@ -125,21 +125,21 @@ class _MunicipalityStatementsPageState
                   if (statement.imageUrls.isNotEmpty)
                     Container(
                       height: MediaQuery.of(context).size.height * 0.3,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         borderRadius:
                             BorderRadius.vertical(top: Radius.circular(20)),
                       ),
                       child: ClipRRect(
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(20)),
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(20)),
                         child: CarouselSlider(
                           options: CarouselOptions(
                             height: MediaQuery.of(context).size.height * 0.3,
                             viewportFraction: 1.0,
                             autoPlay: true,
-                            autoPlayInterval: Duration(seconds: 4),
+                            autoPlayInterval: const Duration(seconds: 4),
                             autoPlayAnimationDuration:
-                                Duration(milliseconds: 1000),
+                                const Duration(milliseconds: 1000),
                             autoPlayCurve: Curves.easeInOutCubic,
                             enlargeCenterPage: false,
                             scrollDirection: Axis.horizontal,
@@ -151,7 +151,7 @@ class _MunicipalityStatementsPageState
                               width: double.infinity,
                               placeholder: (context, url) => Container(
                                 color: Colors.grey.shade300,
-                                child: Center(
+                                child: const Center(
                                   child: CircularProgressIndicator(
                                     valueColor: AlwaysStoppedAnimation<Color>(
                                         Colors.deepOrange),
@@ -173,7 +173,7 @@ class _MunicipalityStatementsPageState
 
                   // Statement Info in popup
                   Padding(
-                    padding: EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -192,7 +192,7 @@ class _MunicipalityStatementsPageState
                               ),
                             ),
                             Container(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 12, vertical: 6),
                               decoration: BoxDecoration(
                                 color: Colors.deepOrange.shade50,
@@ -212,7 +212,7 @@ class _MunicipalityStatementsPageState
                           ],
                         ),
 
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
 
                         // Date
                         Text(
@@ -225,10 +225,10 @@ class _MunicipalityStatementsPageState
                           ),
                         ),
 
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
 
                         // Description
-                        Container(
+                        SizedBox(
                           width: double.infinity,
                           child: Text(
                             statement.description,
@@ -244,7 +244,7 @@ class _MunicipalityStatementsPageState
                           ),
                         ),
 
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
                         // Close Button
                         SizedBox(
@@ -256,9 +256,9 @@ class _MunicipalityStatementsPageState
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              padding: EdgeInsets.symmetric(vertical: 15),
+                              padding: const EdgeInsets.symmetric(vertical: 15),
                             ),
-                            child: Text(
+                            child: const Text(
                               'إغلاق',
                               style: TextStyle(
                                 color: Colors.white,
@@ -283,8 +283,8 @@ class _MunicipalityStatementsPageState
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Scaffold(
-        appBar: ModernAppBar(title: 'بيانات البلدية', showBackButton: false),
+      return const Scaffold(
+        appBar: ModernAppBar(title: 'بلدية أنصار', showBackButton: false),
         body: Center(
           child: CircularProgressIndicator(
             valueColor: AlwaysStoppedAnimation<Color>(Colors.deepOrange),
@@ -299,15 +299,15 @@ class _MunicipalityStatementsPageState
             : statements.where((s) => s.category == selectedCategory).toList();
 
     return Scaffold(
-      appBar: ModernAppBar(title: 'بيانات البلدية', showBackButton: false),
+      appBar: const ModernAppBar(title: 'بلدية أنصار', showBackButton: false),
       body: Column(
         children: [
           // Category Filter
-          Container(
+          SizedBox(
             height: 44,
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: categories.map((category) {
                   final isSelected = selectedCategory == category;
@@ -319,9 +319,9 @@ class _MunicipalityStatementsPageState
                       });
                     },
                     child: Container(
-                      margin: EdgeInsets.only(right: 8),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      margin: const EdgeInsets.only(right: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 8),
                       decoration: BoxDecoration(
                         color: isSelected ? Colors.deepOrange : Colors.white,
                         borderRadius: BorderRadius.circular(20),
@@ -335,7 +335,7 @@ class _MunicipalityStatementsPageState
                           BoxShadow(
                             color: Colors.black.withOpacity(0.05),
                             blurRadius: 4,
-                            offset: Offset(0, 2),
+                            offset: const Offset(0, 2),
                           ),
                         ],
                       ),
@@ -355,7 +355,7 @@ class _MunicipalityStatementsPageState
             ),
           ),
 
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
 
           // Statements List
           Expanded(
@@ -369,7 +369,7 @@ class _MunicipalityStatementsPageState
                           size: 64,
                           color: Colors.grey.shade400,
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         Text(
                           'لا توجد بيانات',
                           style: TextStyle(
@@ -382,7 +382,7 @@ class _MunicipalityStatementsPageState
                     ),
                   )
                 : ListView.builder(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     itemCount: filteredStatements.length,
                     itemBuilder: (context, index) {
                       final statement = filteredStatements[index];
@@ -399,7 +399,7 @@ class _MunicipalityStatementsPageState
     return GestureDetector(
       onTap: () => _showStatementPopup(statement),
       child: Container(
-        margin: EdgeInsets.only(bottom: 16),
+        margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -407,7 +407,7 @@ class _MunicipalityStatementsPageState
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
               blurRadius: 10,
-              offset: Offset(0, 5),
+              offset: const Offset(0, 5),
             ),
           ],
         ),
@@ -418,18 +418,20 @@ class _MunicipalityStatementsPageState
             if (statement.imageUrls.isNotEmpty)
               Container(
                 height: MediaQuery.of(context).size.height * 0.22,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(16)),
                   child: CarouselSlider(
                     options: CarouselOptions(
                       height: MediaQuery.of(context).size.height * 0.22,
                       viewportFraction: 1.0,
                       autoPlay: true,
-                      autoPlayInterval: Duration(seconds: 3),
-                      autoPlayAnimationDuration: Duration(milliseconds: 800),
+                      autoPlayInterval: const Duration(seconds: 3),
+                      autoPlayAnimationDuration:
+                          const Duration(milliseconds: 800),
                       autoPlayCurve: Curves.fastOutSlowIn,
                       enlargeCenterPage: false,
                       scrollDirection: Axis.horizontal,
@@ -441,7 +443,7 @@ class _MunicipalityStatementsPageState
                         width: double.infinity,
                         placeholder: (context, url) => Container(
                           color: Colors.grey.shade300,
-                          child: Center(
+                          child: const Center(
                             child: CircularProgressIndicator(
                               valueColor: AlwaysStoppedAnimation<Color>(
                                   Colors.deepOrange),
@@ -464,7 +466,7 @@ class _MunicipalityStatementsPageState
 
             // Statement Info
             Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -485,10 +487,10 @@ class _MunicipalityStatementsPageState
                           ),
                         ),
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.deepOrange.shade50,
                           borderRadius: BorderRadius.circular(12),
@@ -508,7 +510,7 @@ class _MunicipalityStatementsPageState
                     ],
                   ),
 
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
 
                   // Date
                   Text(
@@ -519,7 +521,7 @@ class _MunicipalityStatementsPageState
                     ),
                   ),
 
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
 
                   // Description
                   Text(
@@ -534,7 +536,7 @@ class _MunicipalityStatementsPageState
                   ),
 
                   // Tap indicator
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -543,7 +545,7 @@ class _MunicipalityStatementsPageState
                         color: Colors.deepOrange.shade400,
                         size: 16,
                       ),
-                      SizedBox(width: 4),
+                      const SizedBox(width: 4),
                       Text(
                         'اضغط لعرض التفاصيل',
                         style: TextStyle(

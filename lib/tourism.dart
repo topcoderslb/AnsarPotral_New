@@ -9,6 +9,8 @@ import 'modern_app_bar.dart';
 import 'services/api_service.dart';
 
 class TourismPage extends StatefulWidget {
+  const TourismPage({super.key});
+
   @override
   _TourismPageState createState() => _TourismPageState();
 }
@@ -45,7 +47,7 @@ class _TourismPageState extends State<TourismPage> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Scaffold(
+      return const Scaffold(
         appBar: ModernAppBar(title: 'ANSAR'),
         body: Center(
           child: CircularProgressIndicator(
@@ -56,7 +58,7 @@ class _TourismPageState extends State<TourismPage> {
     }
 
     return Scaffold(
-      appBar: ModernAppBar(title: 'ANSAR'),
+      appBar: const ModernAppBar(title: 'ANSAR'),
       body: LayoutBuilder(
         builder: (context, constraints) {
           final screenHeight = constraints.maxHeight;
@@ -66,14 +68,15 @@ class _TourismPageState extends State<TourismPage> {
               // Section 1: About Ansar - Modern Carousel Slider
               if (_carouselImages.isNotEmpty)
                 Container(
-                  margin: EdgeInsets.symmetric(vertical: 16, horizontal: 10),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.15),
                         blurRadius: 20,
-                        offset: Offset(0, 10),
+                        offset: const Offset(0, 10),
                         spreadRadius: 2,
                       ),
                     ],
@@ -84,8 +87,9 @@ class _TourismPageState extends State<TourismPage> {
                       options: carousel.CarouselOptions(
                         aspectRatio: 4 / 5.5,
                         autoPlay: true,
-                        autoPlayInterval: Duration(seconds: 4),
-                        autoPlayAnimationDuration: Duration(milliseconds: 1000),
+                        autoPlayInterval: const Duration(seconds: 4),
+                        autoPlayAnimationDuration:
+                            const Duration(milliseconds: 1000),
                         autoPlayCurve: Curves.easeInOutCubic,
                         enlargeCenterPage: true,
                         viewportFraction: 0.85,
@@ -97,14 +101,14 @@ class _TourismPageState extends State<TourismPage> {
                     ),
                   ),
                 ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               // Section 2: Places or Monuments - Cards
               Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Center(
+                    const Center(
                       child: Text(
                         'معالم انصار',
                         style: TextStyle(
@@ -113,7 +117,7 @@ class _TourismPageState extends State<TourismPage> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 16.0),
+                    const SizedBox(height: 16.0),
                     ..._landmarks.map((landmark) {
                       final name = landmark['name'] ?? landmark['title'] ?? '';
                       final imageUrl =
@@ -131,10 +135,10 @@ class _TourismPageState extends State<TourismPage> {
                             _buildPlaceCardWithCall(name, imageUrl, phone)
                           else
                             _buildPlaceCard(name, imageUrl),
-                          SizedBox(height: 16.0),
+                          const SizedBox(height: 16.0),
                         ],
                       );
-                    }).toList(),
+                    }),
                   ],
                 ),
               ),
@@ -147,7 +151,7 @@ class _TourismPageState extends State<TourismPage> {
 
   Widget _buildModernCarouselItem(String imageUrl) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 5),
+      margin: const EdgeInsets.symmetric(horizontal: 5),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
@@ -155,7 +159,7 @@ class _TourismPageState extends State<TourismPage> {
             BoxShadow(
               color: Colors.black.withOpacity(0.2),
               blurRadius: 15,
-              offset: Offset(0, 8),
+              offset: const Offset(0, 8),
               spreadRadius: 2,
             ),
           ],
@@ -171,7 +175,7 @@ class _TourismPageState extends State<TourismPage> {
                 height: double.infinity,
                 placeholder: (context, url) => Container(
                   color: Colors.grey.shade300,
-                  child: Center(
+                  child: const Center(
                     child: CircularProgressIndicator(
                       valueColor:
                           AlwaysStoppedAnimation<Color>(Colors.deepOrange),
@@ -216,7 +220,7 @@ class _TourismPageState extends State<TourismPage> {
         children: [
           if (imageUrl.isNotEmpty)
             ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: 220),
+              constraints: const BoxConstraints(maxHeight: 220),
               child: CachedNetworkImage(
                 imageUrl: imageUrl,
                 fit: BoxFit.cover,
@@ -224,7 +228,7 @@ class _TourismPageState extends State<TourismPage> {
                 placeholder: (context, url) => Container(
                   height: 200,
                   color: Colors.grey.shade300,
-                  child: Center(
+                  child: const Center(
                     child: CircularProgressIndicator(
                       valueColor:
                           AlwaysStoppedAnimation<Color>(Colors.deepOrange),
@@ -247,25 +251,25 @@ class _TourismPageState extends State<TourismPage> {
                   Icon(Icons.landscape, color: Colors.grey.shade400, size: 48),
             ),
           Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Center(
                   child: Text(
                     title,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16.0,
                     ),
                   ),
                 ),
-                SizedBox(height: 8.0),
+                const SizedBox(height: 8.0),
                 Center(
                   child: ElevatedButton.icon(
                     onPressed: () => _makePhoneCall(phoneNumber),
-                    icon: Icon(Icons.phone, color: Colors.white),
-                    label: Text(
+                    icon: const Icon(Icons.phone, color: Colors.white),
+                    label: const Text(
                       'اتصل الآن',
                       style: TextStyle(
                         color: Colors.white,
@@ -277,8 +281,8 @@ class _TourismPageState extends State<TourismPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
                     ),
                   ),
                 ),
@@ -302,7 +306,7 @@ class _TourismPageState extends State<TourismPage> {
         children: [
           if (imageUrl.isNotEmpty)
             ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: 220),
+              constraints: const BoxConstraints(maxHeight: 220),
               child: CachedNetworkImage(
                 imageUrl: imageUrl,
                 fit: BoxFit.cover,
@@ -310,7 +314,7 @@ class _TourismPageState extends State<TourismPage> {
                 placeholder: (context, url) => Container(
                   height: 200,
                   color: Colors.grey.shade300,
-                  child: Center(
+                  child: const Center(
                     child: CircularProgressIndicator(
                       valueColor:
                           AlwaysStoppedAnimation<Color>(Colors.deepOrange),
@@ -333,20 +337,20 @@ class _TourismPageState extends State<TourismPage> {
                   Icon(Icons.landscape, color: Colors.grey.shade400, size: 48),
             ),
           Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Center(
                   child: Text(
                     title,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16.0,
                     ),
                   ),
                 ),
-                SizedBox(height: 8.0),
+                const SizedBox(height: 8.0),
               ],
             ),
           ),

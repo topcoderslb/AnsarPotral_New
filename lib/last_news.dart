@@ -5,7 +5,7 @@ import 'modern_app_bar.dart';
 import 'services/api_service.dart';
 
 class LastNewsPage extends StatefulWidget {
-  const LastNewsPage({Key? key}) : super(key: key);
+  const LastNewsPage({super.key});
 
   @override
   State<LastNewsPage> createState() => _LastNewsPageState();
@@ -36,8 +36,18 @@ class _LastNewsPageState extends State<LastNewsPage> {
 
   // Arabic month names — mirrors the dashboard ar-LB locale output
   static const List<String> _arabicMonths = [
-    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
+    'يناير',
+    'فبراير',
+    'مارس',
+    'أبريل',
+    'مايو',
+    'يونيو',
+    'يوليو',
+    'أغسطس',
+    'سبتمبر',
+    'أكتوبر',
+    'نوفمبر',
+    'ديسمبر',
   ];
 
   /// Returns e.g. "24 مارس 2026  •  02:30 م"
@@ -61,7 +71,7 @@ class _LastNewsPageState extends State<LastNewsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ModernAppBar(title: 'آخر الأخبار', showBackButton: false),
+      appBar: const ModernAppBar(title: 'آخر الأخبار', showBackButton: false),
       body: _isLoading
           ? const Center(
               child: CircularProgressIndicator(

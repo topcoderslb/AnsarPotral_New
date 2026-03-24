@@ -8,12 +8,12 @@ class ModernAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showBackButton;
 
   const ModernAppBar({
-    Key? key,
+    super.key,
     required this.title,
     this.onBackPressed,
     this.actions,
     this.showBackButton = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +43,7 @@ class ModernAppBar extends StatelessWidget implements PreferredSizeWidget {
             BoxShadow(
               color: Colors.black.withOpacity(0.2),
               blurRadius: 10,
-              offset: Offset(0, 3),
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -79,7 +79,7 @@ class ModernAppBar extends StatelessWidget implements PreferredSizeWidget {
                 // Title
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Text(
                       title,
                       style: TextStyle(
@@ -91,7 +91,7 @@ class ModernAppBar extends StatelessWidget implements PreferredSizeWidget {
                         shadows: [
                           Shadow(
                             color: Colors.black.withOpacity(0.3),
-                            offset: Offset(0, 2),
+                            offset: const Offset(0, 2),
                             blurRadius: 4,
                           ),
                         ],
@@ -105,7 +105,10 @@ class ModernAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
 
                 // Actions or balance spacer
-                if (actions != null) ...actions! else SizedBox(width: backBtnSize),
+                if (actions != null)
+                  ...actions!
+                else
+                  SizedBox(width: backBtnSize),
               ],
             ),
           ),
@@ -117,6 +120,6 @@ class ModernAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize {
     // This is a fallback; the actual height adapts in build via PreferredSize
-    return Size.fromHeight(90);
+    return const Size.fromHeight(90);
   }
 }

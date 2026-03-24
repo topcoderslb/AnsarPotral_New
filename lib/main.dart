@@ -15,7 +15,7 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   _MyAppState createState() => _MyAppState();
@@ -94,7 +94,7 @@ class _MyAppState extends State<MyApp> {
 
 /// Root shell with bottom navigation bar
 class MainShell extends StatefulWidget {
-  const MainShell({Key? key}) : super(key: key);
+  const MainShell({super.key});
 
   @override
   State<MainShell> createState() => _MainShellState();
@@ -181,7 +181,7 @@ class _MainShellState extends State<MainShell> {
                       BottomNavigationBarItem(
                         icon: Icon(Icons.description_rounded),
                         activeIcon: Icon(Icons.description_rounded, size: 28),
-                        label: 'البيانات',
+                        label: 'بلدية أنصار',
                       ),
                       BottomNavigationBarItem(
                         icon: Icon(Icons.feedback_rounded),

@@ -1,11 +1,34 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { apiFetch } from '@/lib/api';
 import { MunicipalityStatement } from '@/lib/types';
 import DataTable from '@/components/DataTable';
 import ImageUpload from '@/components/ImageUpload';
 import Image from 'next/image';
+
+// Arabic month names — same format used in the news page
+const ARABIC_MONTHS = [
+    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
+];
+
+function formatArabicDateTime(value: string | undefined) {
+    if (!value) return '-';
+    try {
+        const dt = new Date(value);
+        const day = dt.getDate();
+        const month = ARABIC_MONTHS[dt.getMonth()];
+        const year = dt.getFullYear();
+        let hours = dt.getHours();
+        const minutes = String(dt.getMinutes()).padStart(2, '0');
+        const amPm = hours >= 12 ? 'م' : 'ص';
+        hours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+        return `${day} ${month} ${year}  •  ${String(hours).padStart(2, '0')}:${minutes} ${amPm}`;
+    } catch {
+        return value;
+    }
+}
 
 export default function StatementsPage() {
     const [statements, setStatements] = useState<MunicipalityStatement[]>([]);
@@ -13,6 +36,9 @@ export default function StatementsPage() {
     const [showForm, setShowForm] = useState(false);
     const [editingStatement, setEditingStatement] = useState<MunicipalityStatement | null>(null);
     const [saving, setSaving] = useState(false);
+    const [savedCategories, setSavedCategories] = useState<string[]>([]);
+    const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
+    const categoryRef = useRef<HTMLDivElement>(null);
 
     // Form state
     const [formData, setFormData] = useState({
@@ -26,7 +52,40 @@ export default function StatementsPage() {
 
     useEffect(() => {
         fetchStatements();
+        loadCategories();
     }, []);
+
+    // Close category dropdown on outside click
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (categoryRef.current && !categoryRef.current.contains(e.target as Node)) {
+                setCategoryDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, []);
+
+    const loadCategories = async () => {
+        try {
+            // Load previously saved categories from the statement-categories API
+            const data = await apiFetch<{ id: number; name: string }[]>('statement-categories');
+            setSavedCategories(data.map(c => c.name));
+        } catch {
+            // Fallback: extract unique categories from loaded statements
+        }
+    };
+
+    // Called when user submits a category that's not already saved
+    const saveNewCategory = async (name: string) => {
+        if (!name.trim() || savedCategories.includes(name.trim())) return;
+        try {
+            await apiFetch('statement-categories', { method: 'POST', body: { name: name.trim(), order: savedCategories.length } });
+            setSavedCategories(prev => [...prev, name.trim()]);
+        } catch {
+            // Non-critical — the statement still saves even if category save fails
+        }
+    };
 
     const fetchStatements = async () => {
         try {
@@ -49,6 +108,9 @@ export default function StatementsPage() {
         setSaving(true);
 
         try {
+            // Persist new category if not already saved
+            await saveNewCategory(formData.category);
+
             if (editingStatement?.id) {
                 await apiFetch('statements.php', {
                     method: 'PUT',
@@ -126,14 +188,6 @@ export default function StatementsPage() {
         setFormData({ ...formData, imageUrls: newUrls });
     };
 
-    const formatDate = (dateValue: string | undefined) => {
-        if (!dateValue) return '-';
-        try {
-            return new Date(dateValue).toLocaleDateString('ar-LB');
-        } catch {
-            return dateValue;
-        }
-    };
 
     const columns = [
         {
@@ -162,7 +216,9 @@ export default function StatementsPage() {
         {
             key: 'date',
             header: 'التاريخ',
-            render: (statement: MunicipalityStatement) => formatDate(statement.date),
+            render: (statement: MunicipalityStatement) => (
+                <span className="text-sm text-gray-600 whitespace-nowrap">{formatArabicDateTime(statement.date)}</span>
+            ),
         },
         {
             key: 'isActive',
@@ -181,14 +237,14 @@ export default function StatementsPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-800">بيانات البلدية</h1>
-                    <p className="text-gray-500 mt-1">إدارة بيانات وإعلانات البلدية</p>
+                    <h1 className="text-3xl font-bold text-gray-800">بلدية أنصار</h1>
+                    <p className="text-gray-500 mt-1">إدارة تقارير وإعلانات بلدية أنصار</p>
                 </div>
                 <button
                     onClick={() => setShowForm(true)}
                     className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg font-medium hover:from-orange-600 hover:to-orange-700 transition-all shadow-lg"
                 >
-                    ➕ إضافة بيان
+                    ➕ إضافة تقرير
                 </button>
             </div>
 
@@ -198,7 +254,7 @@ export default function StatementsPage() {
                     <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                         <div className="p-6 border-b border-gray-100">
                             <h2 className="text-xl font-bold text-gray-800">
-                                {editingStatement ? 'تعديل بيان' : 'إضافة بيان جديد'}
+                                {editingStatement ? 'تعديل تقرير' : 'إضافة تقرير جديد'}
                             </h2>
                         </div>
 
@@ -216,14 +272,56 @@ export default function StatementsPage() {
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">التصنيف *</label>
-                                <input
-                                    type="text"
-                                    value={formData.category}
-                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                    placeholder="مشاريع، إعلانات، تقارير..."
-                                    required
-                                />
+                                <div ref={categoryRef} className="relative">
+                                    <div className="flex">
+                                        <input
+                                            type="text"
+                                            value={formData.category}
+                                            onChange={(e) => {
+                                                setFormData({ ...formData, category: e.target.value });
+                                                setCategoryDropdownOpen(true);
+                                            }}
+                                            onFocus={() => setCategoryDropdownOpen(true)}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
+                                            placeholder="اكتب تصنيفاً أو اختر من القائمة..."
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setCategoryDropdownOpen(o => !o)}
+                                            className="px-3 border border-r-0 border-gray-300 rounded-l-lg bg-gray-50 hover:bg-gray-100 text-gray-500"
+                                        >
+                                            <svg className={`w-4 h-4 transition-transform ${categoryDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    {categoryDropdownOpen && savedCategories.length > 0 && (
+                                        <ul className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                                            {savedCategories
+                                                .filter(cat => !formData.category || cat.toLowerCase().includes(formData.category.toLowerCase()))
+                                                .map(cat => (
+                                                    <li
+                                                        key={cat}
+                                                        onMouseDown={(e) => {
+                                                            e.preventDefault();
+                                                            setFormData({ ...formData, category: cat });
+                                                            setCategoryDropdownOpen(false);
+                                                        }}
+                                                        className="px-4 py-2 cursor-pointer hover:bg-orange-50 hover:text-orange-700 text-sm text-right"
+                                                    >
+                                                        {cat}
+                                                    </li>
+                                                ))}
+                                        </ul>
+                                    )}
+                                    {categoryDropdownOpen && savedCategories.length > 0 &&
+                                        savedCategories.filter(cat => !formData.category || cat.toLowerCase().includes(formData.category.toLowerCase())).length === 0 && (
+                                            <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg px-4 py-2 text-sm text-gray-400 text-right">
+                                                سيتم حفظ هذا التصنيف الجديد تلقائياً
+                                            </div>
+                                    )}
+                                </div>
                             </div>
 
                             <div>
@@ -306,7 +404,7 @@ export default function StatementsPage() {
                 loading={loading}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
-                emptyMessage="لا توجد بيانات. اضغط على 'إضافة بيان' للبدء."
+                emptyMessage="لا توجد تقارير. اضغط على 'إضافة تقرير' للبدء."
             />
         </div>
     );
