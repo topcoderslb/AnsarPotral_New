@@ -177,11 +177,15 @@ class ApiService {
 
   // ============= COMPLAINTS =============
 
-  Future<bool> submitComplaint({
+  Future<Map<String, dynamic>> submitComplaint({
     required String name,
     required String phone,
     required String complaintText,
     String? imageUrl,
+    String? deviceId,
+    String? deviceName,
+    String? deviceModel,
+    String? osVersion,
   }) async {
     try {
       final response = await http.post(
@@ -192,13 +196,24 @@ class ApiService {
           'phone': phone,
           'complaintText': complaintText,
           'imageUrl': imageUrl,
+          'deviceId': deviceId,
+          'deviceName': deviceName,
+          'deviceModel': deviceModel,
+          'osVersion': osVersion,
         }),
       );
 
-      return response.statusCode == 200 || response.statusCode == 201;
+      final data = json.decode(response.body);
+      if (response.statusCode == 403 && data['error'] == 'blocked') {
+        return {'success': false, 'blocked': true, 'message': data['message']};
+      }
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return {'success': true};
+      }
+      return {'success': false, 'message': data['error'] ?? 'فشل إرسال الشكوى'};
     } catch (e) {
       print('Error submitting complaint: $e');
-      return false;
+      return {'success': false, 'message': 'حدث خطأ في الاتصال'};
     }
   }
 

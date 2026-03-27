@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'modern_app_bar.dart';
 import 'services/api_service.dart';
 
@@ -20,6 +21,57 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
   XFile? _selectedImage;
   bool _isSubmitting = false;
   final ApiService _apiService = ApiService();
+
+  String _deviceId = '';
+  String _deviceName = '';
+  String _deviceModel = '';
+  String _osVersion = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDeviceInfo();
+  }
+
+  Future<void> _loadDeviceInfo() async {
+    final deviceInfo = DeviceInfoPlugin();
+    try {
+      if (kIsWeb) {
+        final web = await deviceInfo.webBrowserInfo;
+        final ua = web.userAgent ?? '';
+        _deviceId =
+            '${ua.hashCode}_${web.browserName.name}_${web.platform ?? 'unknown'}';
+        _deviceName = web.browserName.name;
+        _deviceModel = web.platform ?? 'Web';
+        _osVersion = web.appVersion ?? 'Web';
+      } else if (defaultTargetPlatform == TargetPlatform.android) {
+        final android = await deviceInfo.androidInfo;
+        _deviceId = '${android.id}_${android.fingerprint}';
+        _deviceName = android.brand;
+        _deviceModel = android.model;
+        _osVersion =
+            'Android ${android.version.release} (SDK ${android.version.sdkInt})';
+      } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+        final ios = await deviceInfo.iosInfo;
+        _deviceId = '${ios.identifierForVendor ?? ''}_${ios.utsname.machine}';
+        _deviceName = ios.name;
+        _deviceModel = ios.model;
+        _osVersion = '${ios.systemName} ${ios.systemVersion}';
+      } else if (defaultTargetPlatform == TargetPlatform.windows) {
+        final windows = await deviceInfo.windowsInfo;
+        _deviceId = '${windows.deviceId}_${windows.computerName}';
+        _deviceName = windows.computerName;
+        _deviceModel = 'Windows';
+        _osVersion =
+            'Windows ${windows.majorVersion}.${windows.minorVersion} (Build ${windows.buildNumber})';
+      }
+    } catch (e) {
+      _deviceId = 'unknown_${DateTime.now().millisecondsSinceEpoch}';
+      _deviceName = 'Unknown';
+      _deviceModel = 'Unknown';
+      _osVersion = 'Unknown';
+    }
+  }
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
@@ -51,19 +103,64 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
           imageUrl = await _apiService.uploadImage(_selectedImage!);
         }
 
-        // Submit complaint to API
-        final success = await _apiService.submitComplaint(
+        // Submit complaint to API with device info
+        final result = await _apiService.submitComplaint(
           name: _nameController.text,
           phone: _phoneController.text,
           complaintText: _complaintController.text,
           imageUrl: imageUrl,
+          deviceId: _deviceId,
+          deviceName: _deviceName,
+          deviceModel: _deviceModel,
+          osVersion: _osVersion,
         );
 
         setState(() {
           _isSubmitting = false;
         });
 
-        if (success) {
+        if (result['blocked'] == true) {
+          // Device is blocked
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                title: const Row(
+                  children: [
+                    Icon(Icons.block, color: Colors.red, size: 28),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'تم حظر الجهاز',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+                content: Text(
+                  result['message'] ??
+                      'Your access has been restricted due to inappropriate use.',
+                  style: const TextStyle(fontSize: 15),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text(
+                      'حسناً',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+        } else if (result['success'] == true) {
           // Show success dialog
           showDialog(
             context: context,

@@ -39,3 +39,11 @@ export function requireAuth(request: NextRequest): JwtPayload {
   }
   return user;
 }
+
+export function requirePrimaryAdmin(request: NextRequest): JwtPayload {
+  const user = requireAuth(request);
+  if (user.role !== 'admin') {
+    throw new Error('Forbidden');
+  }
+  return user;
+}

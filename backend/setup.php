@@ -144,10 +144,27 @@ try {
         `phone` VARCHAR(50) NOT NULL,
         `complaint_text` TEXT NOT NULL,
         `image_url` TEXT,
+        `device_id` VARCHAR(255) DEFAULT NULL,
+        `device_name` VARCHAR(255) DEFAULT NULL,
+        `device_model` VARCHAR(255) DEFAULT NULL,
+        `os_version` VARCHAR(255) DEFAULT NULL,
+        `ip_address` VARCHAR(45) DEFAULT NULL,
         `status` ENUM('new', 'reviewed', 'resolved') NOT NULL DEFAULT 'new',
         `notes` TEXT,
         `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB");
+
+    // Blocked devices table
+    $pdo->exec("CREATE TABLE IF NOT EXISTS `blocked_devices` (
+        `id` INT AUTO_INCREMENT PRIMARY KEY,
+        `device_id` VARCHAR(255) NOT NULL UNIQUE,
+        `device_name` VARCHAR(255) DEFAULT NULL,
+        `device_model` VARCHAR(255) DEFAULT NULL,
+        `os_version` VARCHAR(255) DEFAULT NULL,
+        `ip_address` VARCHAR(45) DEFAULT NULL,
+        `reason` TEXT,
+        `blocked_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB");
 
     // App settings table (key-value)

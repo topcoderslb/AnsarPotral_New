@@ -3,16 +3,32 @@
 import { useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { Complaint, normalizeComplaint } from '@/lib/types';
+import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
 
+interface BlockedDevice {
+    id: number;
+    device_id: string;
+    device_name: string | null;
+    device_model: string | null;
+    os_version: string | null;
+    ip_address: string | null;
+    reason: string | null;
+    blocked_at: string;
+}
+
 export default function ComplaintsPage() {
+    const { user } = useAuth();
+    const isPrimaryAdmin = user?.role === 'admin';
     const [complaints, setComplaints] = useState<Complaint[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null);
     const [filter, setFilter] = useState<'all' | 'new' | 'reviewed' | 'resolved'>('all');
+    const [blockedDevices, setBlockedDevices] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         fetchComplaints();
+        if (isPrimaryAdmin) fetchBlockedDevices();
     }, []);
 
     const fetchComplaints = async () => {
@@ -23,6 +39,53 @@ export default function ComplaintsPage() {
             console.error('Error fetching complaints:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchBlockedDevices = async () => {
+        try {
+            const data = await apiFetch<BlockedDevice[]>('blocked-devices');
+            setBlockedDevices(new Set(data.map(d => d.device_id)));
+        } catch {
+            // non-critical
+        }
+    };
+
+    const blockDevice = async (complaint: Complaint) => {
+        if (!isPrimaryAdmin) return;
+        const deviceId = complaint.deviceId || '';
+        if (!deviceId) { alert('لا يوجد معرّف جهاز لهذه الشكوى'); return; }
+        if (!confirm(`هل أنت متأكد من حظر هذا الجهاز؟\n${complaint.deviceName || ''} ${complaint.deviceModel || ''}`)) return;
+        try {
+            await apiFetch('blocked-devices', {
+                method: 'POST',
+                body: {
+                    device_id: deviceId,
+                    device_name: complaint.deviceName || '',
+                    device_model: complaint.deviceModel || '',
+                    os_version: complaint.osVersion || '',
+                    ip_address: complaint.ipAddress || '',
+                    reason: 'Blocked by admin from complaints page',
+                },
+            });
+            setBlockedDevices(prev => new Set([...prev, deviceId]));
+            alert('تم حظر الجهاز بنجاح');
+        } catch (error) {
+            console.error(error);
+            alert('حدث خطأ في حظر الجهاز');
+        }
+    };
+
+    const unblockDevice = async (deviceId: string) => {
+        if (!isPrimaryAdmin) return;
+        if (!confirm('هل أنت متأكد من إلغاء حظر هذا الجهاز؟')) return;
+        try {
+            await apiFetch(`blocked-devices?device_id=${encodeURIComponent(deviceId)}`, { method: 'DELETE' });
+            setBlockedDevices(prev => { const next = new Set(prev); next.delete(deviceId); return next; });
+            alert('تم إلغاء حظر الجهاز');
+        } catch (error) {
+            console.error(error);
+            alert('حدث خطأ في إلغاء الحظر');
         }
     };
 
@@ -40,6 +103,19 @@ export default function ComplaintsPage() {
         } catch (error) {
             console.error('Error updating status:', error);
             alert('حدث خطأ في تحديث الحالة');
+        }
+    };
+
+    const deleteComplaint = async (complaintId: string | number) => {
+        if (!isPrimaryAdmin) return;
+        if (!confirm('هل أنت متأكد من حذف هذه الشكوى نهائياً؟')) return;
+        try {
+            await apiFetch(`complaints?id=${complaintId}`, { method: 'DELETE' });
+            setSelectedComplaint(null);
+            await fetchComplaints();
+        } catch (error) {
+            console.error('Error deleting complaint:', error);
+            alert('حدث خطأ في حذف الشكوى');
         }
     };
 
@@ -145,7 +221,12 @@ export default function ComplaintsPage() {
                                 >
                                     <div className="flex items-start justify-between gap-2">
                                         <div className="flex-1 min-w-0">
-                                            <p className="font-medium text-gray-800 truncate">{complaint.name}</p>
+                                            <div className="flex items-center gap-2">
+                                                <p className="font-medium text-gray-800 truncate">{complaint.name}</p>
+                                                {complaint.deviceId && blockedDevices.has(complaint.deviceId) && (
+                                                    <span className="px-1.5 py-0.5 bg-red-100 text-red-600 rounded text-[10px] font-bold shrink-0">محظور</span>
+                                                )}
+                                            </div>
                                             <p className="text-sm text-gray-500 truncate">{complaint.complaintText}</p>
                                             <p className="text-xs text-gray-400 mt-1">{formatDate(complaint.createdAt)}</p>
                                         </div>
@@ -199,6 +280,58 @@ export default function ComplaintsPage() {
                                     </div>
                                 )}
 
+                                {/* Device Info - full details for primary admin, basic for others */}
+                                {selectedComplaint.deviceId && (
+                                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                        <label className="block text-sm font-medium text-gray-500 mb-2">معلومات الجهاز</label>
+                                        {isPrimaryAdmin ? (
+                                            <>
+                                                <div className="grid grid-cols-2 gap-3 text-sm">
+                                                    <div>
+                                                        <span className="text-gray-400">معرّف الجهاز:</span>
+                                                        <p className="text-gray-700 font-mono text-xs mt-0.5 break-all">{selectedComplaint.deviceId}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-gray-400">اسم الجهاز:</span>
+                                                        <p className="text-gray-700 mt-0.5">{selectedComplaint.deviceName || '—'}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-gray-400">طراز الجهاز:</span>
+                                                        <p className="text-gray-700 mt-0.5">{selectedComplaint.deviceModel || '—'}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-gray-400">نظام التشغيل:</span>
+                                                        <p className="text-gray-700 mt-0.5">{selectedComplaint.osVersion || '—'}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-gray-400">عنوان IP:</span>
+                                                        <p className="text-gray-700 font-mono text-xs mt-0.5">{selectedComplaint.ipAddress || '—'}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="mt-3 pt-3 border-t border-gray-200 flex gap-2">
+                                                    {blockedDevices.has(selectedComplaint.deviceId) ? (
+                                                        <button
+                                                            onClick={() => unblockDevice(selectedComplaint.deviceId!)}
+                                                            className="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium"
+                                                        >
+                                                            ✅ إلغاء حظر الجهاز
+                                                        </button>
+                                                    ) : (
+                                                        <button
+                                                            onClick={() => blockDevice(selectedComplaint)}
+                                                            className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium"
+                                                        >
+                                                            🚫 حظر هذا الجهاز
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <p className="text-sm text-gray-400 italic">معلومات الجهاز متاحة فقط للمدير الرئيسي</p>
+                                        )}
+                                    </div>
+                                )}
+
                                 {/* Status Actions */}
                                 <div className="pt-4 border-t border-gray-100">
                                     <label className="block text-sm font-medium text-gray-500 mb-2">تغيير الحالة</label>
@@ -229,6 +362,18 @@ export default function ComplaintsPage() {
                                         )}
                                     </div>
                                 </div>
+
+                                {/* Delete - Primary Admin Only */}
+                                {isPrimaryAdmin && (
+                                    <div className="pt-4 border-t border-gray-100">
+                                        <button
+                                            onClick={() => deleteComplaint(selectedComplaint.id!)}
+                                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+                                        >
+                                            🗑️ حذف الشكوى نهائياً
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ) : (

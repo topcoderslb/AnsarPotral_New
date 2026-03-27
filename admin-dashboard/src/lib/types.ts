@@ -89,6 +89,16 @@ export interface Complaint {
     complaint_text?: string;
     imageUrl?: string;
     image_url?: string;
+    deviceId?: string;
+    device_id?: string;
+    deviceName?: string;
+    device_name?: string;
+    deviceModel?: string;
+    device_model?: string;
+    osVersion?: string;
+    os_version?: string;
+    ipAddress?: string;
+    ip_address?: string;
     createdAt?: string;
     created_at?: string;
     status: 'new' | 'reviewed' | 'resolved';
@@ -131,6 +141,11 @@ export function normalizeComplaint(c: Complaint): Complaint {
         ...c,
         complaintText: c.complaintText || c.complaint_text || '',
         imageUrl: c.imageUrl || c.image_url || '',
+        deviceId: c.deviceId || c.device_id || '',
+        deviceName: c.deviceName || c.device_name || '',
+        deviceModel: c.deviceModel || c.device_model || '',
+        osVersion: c.osVersion || c.os_version || '',
+        ipAddress: c.ipAddress || c.ip_address || '',
         createdAt: c.createdAt || c.created_at || '',
     };
 }
